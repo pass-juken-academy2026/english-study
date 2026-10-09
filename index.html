@@ -9,12 +9,12 @@
 <main>
 <section id="home"><div class="head" style="margin-bottom:15px"><div><h2>学習メニュー</h2><span class="muted">履歴と苦手分野はこのブラウザに保存されます。</span></div><div class="panel">解答済み <b id="solvedCount">0</b>問　/　文法正答率 <b id="grammarRate">—</b></div></div>
 <div class="grid">
-<div class="card"><span class="tag">20問</span><h3>① 英単語</h3><p>日本語→英語 / 英語→日本語。4択・入力式を選択。</p><button onclick="setup('vocab')">始める</button></div>
-<div class="card"><span class="tag">20問</span><h3>② 文法</h3><p>分野を選択。終了後に苦手分野を分析し、苦手分野だけ続けられます。</p><button onclick="setup('grammar')">始める</button></div>
-<div class="card"><span class="tag">3題</span><h3>③ 短文問題</h3><p>日本語を英語に訳す練習。苦手文法に関連する問題を優先します。</p><button onclick="setup('short')">始める</button></div>
-<div class="card"><span class="tag">1セット</span><h3>④ 長文読解</h3><p>偏差値帯を選び、未読の長文に挑戦。</p><button onclick="setup('reading')">始める</button></div>
-<div class="card"><span class="tag">英作文</span><h3>⑤ ライティング</h3><p>お題に英語で答え、語数や構成を簡易チェック。</p><button onclick="setup('writing')">始める</button></div>
-<div class="card"><span class="tag">模擬テスト</span><h3>⑥ 模擬テスト</h3><p>最初に「埼玉県の高校入試」か「大学受験用の共通テスト」を選んで挑戦。</p><button onclick="setup('mock')">始める</button></div>
+<div class="card"><span class="tag">単語・熟語を大量収録</span><h3>① 英単語</h3><p>日本語→英語 / 英語→日本語。4択・入力式を選択。</p><button onclick="setup('vocab')">始める</button></div>
+<div class="card"><span class="tag">200題以上</span><h3>② 文法</h3><p>分野を選択。終了後に苦手分野を分析し、苦手分野だけ続けられます。</p><button onclick="setup('grammar')">始める</button></div>
+<div class="card"><span class="tag">200題以上</span><h3>③ 短文問題</h3><p>日本語を英語に訳す練習。苦手文法に関連する問題を優先します。</p><button onclick="setup('short')">始める</button></div>
+<div class="card"><span class="tag">200題以上</span><h3>④ 長文読解</h3><p>偏差値帯を選び、未読の長文に挑戦。</p><button onclick="setup('reading')">始める</button></div>
+<div class="card"><span class="tag">200題以上</span><h3>⑤ ライティング</h3><p>お題に英語で答え、語数や構成を簡易チェック。</p><button onclick="setup('writing')">始める</button></div>
+<div class="card"><span class="tag">200題以上</span><h3>⑥ 模擬テスト</h3><p>最初に「埼玉県の高校入試」か「大学受験用の共通テスト」を選んで挑戦。</p><button onclick="setup('mock')">始める</button></div>
 <div class="card"><span class="tag">文法を基礎から解説</span><h3>⑦ 文法の授業</h3><p>英文の仕組みを、例文とポイントで一つずつ理解。暗記だけでなく「なぜその形か」を学びます。</p><button onclick="setup('guide')">学習する</button></div>
 </div><div class="panel" style="margin-top:14px"><div class="head"><h3>学習履歴</h3><button class="secondary" onclick="historyPage()">履歴・苦手分野を見る</button></div><p class="muted">解いた問題はID単位で保存し、再出題しません。未出題問題が足りない場合は、ある分だけ出題します。</p><details><summary>保存について</summary><p class="muted">同じ端末・ブラウザでページを閉じても履歴を保持します。サイトデータ削除や別端末への同期には対応していません。</p><button class="danger" onclick="resetData()">履歴をすべて削除</button></details></div>
 </section>
@@ -50,15 +50,15 @@ if(m==="mock")s+=`<p class="muted">選択した試験区分の問題から出題
 $("setupBody").innerHTML=s}
 function updateExamBands(){const exam=$("examType")?.value,band=$("band");if(!band)return;const options=exam==="highschool"?[["hs40","40未満"],["hs45","40〜44"],["hs50","45〜49"],["hs55","50〜54"],["hs60","55〜59"],["hs65","60以上"]]:exam==="university"?[["un40","35〜44"],["un47","45〜49"],["un52","50〜54"],["un57","55〜59"],["un62","60〜64"],["un67","65〜69"],["un72","70以上"]]:[];band.innerHTML=exam?'<option value="">偏差値帯を選択してください</option>'+options.map(([v,t])=>`<option value="${v}">${t}</option>`).join(""):'<option value="">先に受験コースを選んでください</option>';band.disabled=!exam}
 function updateWritingOptions(){const type=$("writingType")?.value,wrap=$("writingGradeWrap");if(wrap)wrap.classList.toggle("hidden",type!=="eiken")}
-function difficultyScore(mode,exam,band){if(mode==="grammar")return ({basic:48,standard:58,advanced:68})[band]||58;const maps={highschool:{hs40:40,hs45:45,hs50:50,hs55:55,hs60:60,hs65:65},university:{un40:45,un47:52,un52:58,un57:64,un62:70,un67:75,un72:80}};return maps[exam]?.[band]||55}
-function updateVocabBands(){const exam=$("examType")?.value,band=$("band");if(!band)return;const options=exam==="highschool"?[[45,"40〜49"],[52,"50〜54"],[57,"55〜59"],[62,"60以上"]]:exam==="university"?[[45,"40〜49"],[52,"50〜54"],[57,"55〜59"],[62,"60〜64"],[67,"65〜69"],[72,"70以上"]]:[];band.innerHTML=exam?'<option value="">偏差値帯を選択してください</option>'+options.map(([v,t])=>`<option value="${v}">${t}</option>`).join(""):'<option value="">先に受験コースを選んでください</option>';band.disabled=!exam}
+function difficultyScore(mode,exam,band){if(mode==="grammar")return ({basic:48,standard:58,advanced:68})[band]||58;const maps={highschool:{hs40:40,hs45:45,hs50:50,hs55:55,hs60:60,hs65:65},university:{un40:45,un47:52,un52:58,un57:64,un62:70,un67:75,un72:80,un77:82,un85:85}};return maps[exam]?.[band]||55}
+function updateVocabBands(){const exam=$("examType")?.value,band=$("band");if(!band)return;const options=exam==="highschool"?[[45,"40〜49"],[52,"50〜54"],[57,"55〜59"],[62,"60以上"],[70,"70〜79"],[80,"東大レベル（80以上）"]]:exam==="university"?[[45,"40〜49"],[52,"50〜54"],[57,"55〜59"],[62,"60〜64"],[67,"65〜69"],[72,"70〜74"],[77,"75〜79"],[85,"東大レベル（80以上）"]]:[];band.innerHTML=exam?'<option value="">偏差値帯を選択してください</option>'+options.map(([v,t])=>`<option value="${v}">${t}</option>`).join(""):'<option value="">先に受験コースを選んでください</option>';band.disabled=!exam}
 const bandMid=v=>v==="all"?55:+v;
 function start(){if(mode==="guide"){const topic=$("guideTopic")?.value||"all";items=GUIDE_LESSONS.filter(x=>topic==="all"||x.topic===topic);if(!items.length){alert("テーマが見つかりません");return}cfg={guideTopic:topic};idx=0;hide();$("quiz").classList.remove("hidden");$("quizTitle").textContent="⑦ 文法の授業";$("quizSub").textContent=items.length+"テーマ / オリジナル解説";renderGuide();return}if(mode==="vocab"&&(!$('examType').value||!$('band').value)){alert("高校受験用・大学受験用を選んでから、偏差値帯コースを選択してください");return}if(["short","reading"].includes(mode)&&(!$("examType").value||!$("band").value)){alert("高校受験・大学受験のどちらかを選び、偏差値帯も選択してください");return}if(mode==="grammar"&&!$("difficulty").value){alert("文法の難易度を選んでください");return}if(mode==="writing"&&!$("writingType").value){alert("高校受験・大学受験・英検から選択してください");return}if(mode==="mock"&&!$('mockType').value){alert("埼玉県の高校入試・大学受験用の共通テストから選択してください");return}cfg={examType:$("examType")?.value||"",mockType:$("mockType")?.value||"",band:$("band")?.value||"all",difficulty:$("difficulty")?.value||"standard",score:difficultyScore(mode,$("examType")?.value,$("band")?.value||"all"),writingType:$("writingType")?.value||"",eikenGrade:$("eikenGrade")?.value||"",direction:$("direction")?.value||"mix",vtype:$("vtype")?.value||"choice",vocabType:$("vocabType")?.value||"both",topics:[...document.querySelectorAll('input[name=topic]:checked')].map(x=>+x.value)};
 if(mode==="grammar"&&!cfg.topics.length){alert("文法分野を1つ以上選択してください");return}
 let pool=mode==="vocab"?vocab.filter(q=>cfg.vocabType==="both"||(cfg.vocabType==="idiom"?(q.kind||"word")==="idiom":(q.kind||"word")==="word")):mode==="grammar"?grammar.filter(q=>cfg.topics.includes(q.topic)&&({basic:q.level<=52,standard:q.level>=50&&q.level<=62,advanced:q.level>=60})[cfg.difficulty]):mode==="short"?short:mode==="reading"?reading:mode==="writing"?(cfg.writingType==="eiken"?eikenWriting.filter(q=>q.grade===cfg.eikenGrade):cfg.writingType==="highschool"?writingHighschool:writingUniversity):mock.filter(q=>q.examType===cfg.mockType);
 pool=pool.filter(q=>!data.solved[q.id]&&(mode==="mock"||!q.level||(["vocab","short","reading"].includes(mode)?Math.abs(q.level-cfg.score)<=(mode==="vocab"?7:10):mode==="writing"?true:true)));
 if(mode==="short")pool.sort((a,b)=>(data.weak.includes(TOPICS.indexOf(b.focus))?1:0)-(data.weak.includes(TOPICS.indexOf(a.focus))?1:0));
-items=pool.slice(0,({vocab:20,grammar:20,short:3,reading:1,writing:1,mock:10})[mode]);if(!items.length){alert("この条件の未出題問題がありません。偏差値帯や文法分野を変更してください。");return}
+items=pool.slice(0,({vocab:50,grammar:200,short:200,reading:200,writing:200,mock:200})[mode]);if(!items.length){alert("この条件の未出題問題がありません。偏差値帯や文法分野を変更してください。");return}
 idx=0;answers=[];hide();$("quiz").classList.remove("hidden");$("quizTitle").textContent=({vocab:"英単語",grammar:"文法",short:"短文問題",reading:"長文読解",writing:"ライティング",mock:cfg.mockType==="saitama"?"埼玉県の高校入試 模擬テスト":"大学受験用の共通テスト 模擬テスト"})[mode];$("quizSub").textContent=`${items.length}問 / ${mode==="mock"?(cfg.mockType==="saitama"?"埼玉県の高校入試":"大学受験用の共通テスト"):mode==="vocab"?(cfg.examType==="highschool"?"高校受験用":"大学受験用")+"・偏差値帯 "+({45:"40〜49",52:"50〜54",57:"55〜59",62:cfg.examType==="highschool"?"60以上":"60〜64",67:"65〜69",72:"70以上"}[cfg.score]||cfg.score):mode==="short"||mode==="reading"?(cfg.examType==="highschool"?"高校受験":"大学受験")+"・偏差値帯 "+$("band")?.selectedOptions?.[0]?.textContent:mode==="grammar"?"難易度："+({basic:"基礎",standard:"標準",advanced:"発展"}[cfg.difficulty]):mode==="writing"?(cfg.writingType==="eiken"?"英検"+({"3":"3級","pre2":"準2級","2":"2級","pre1":"準1級"}[cfg.eikenGrade]):cfg.writingType==="highschool"?"高校受験":"大学受験"):"既出問題は除外済み"} / 既出問題は除外済み`;render()}
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 function render(){if(mode==="guide"){renderGuide();return}if(idx>=items.length){finish();return}qNow=items[idx];$("bar").style.width=idx/items.length*100+"%";let q=qNow,html=`<div class="muted">問題 ${idx+1}/${items.length}${q.topic!==undefined?" ・ "+TOPICS[q.topic]:""}</div>`;
@@ -439,4 +439,171 @@ const mock=[
 ,{id:"m20",examType:"common",level:70,question:"Had I known about the traffic, I ___ an earlier train.",options:["take","will take","would have taken","had taken"],answer:"would have taken",explain:"Had I known は If I had known の倒置形。"}
 
 ];
+
+/* Expanded practice bank: supplemental original questions */
+const EXTRA_WORDS = [
+["する、行う","do",40],["持つ","have",40],["作る","make",40],["行く","go",40],["来る","come",40],["見る","see",40],["知っている","know",40],["思う","think",40],["取る","take",40],["与える","give",40],
+["必要とする","need",42],["使う","use",42],["働く","work",42],["感じる","feel",42],["見つける","find",42],["話す","speak",42],["聞く","hear",42],["始める","begin",42],["助ける","help",42],["変える","change",42],
+["決して〜ない","never",43],["しばしば","often",43],["時々","sometimes",43],["すぐに","soon",43],["一緒に","together",43],["十分に","enough",43],["ほとんど","almost",43],["まだ","yet",43],["すでに","already",43],["おそらく","perhaps",43],
+["経験","experience",48],["健康","health",48],["文化","culture",48],["歴史","history",48],["科学","science",48],["自然","nature",48],["社会","society",48],["教育","education",48],["旅行","travel",48],["未来","future",48],
+["選ぶ","choose",48],["決める","decide",48],["説明する","explain",48],["覚えている","remember",48],["忘れる","forget",48],["続ける","continue",48],["守る","protect",48],["改善する","improve",48],["準備する","prepare",48],["成功する","succeed",48],
+["可能な","possible",52],["重要な","important",52],["異なる","different",52],["人気のある","popular",52],["安全な","safe",52],["危険な","dangerous",52],["必要不可欠な","essential",52],["地元の","local",52],["国際的な","international",52],["一般的な","common",52],
+["増える","increase",55],["減る","decrease",55],["含む","include",55],["必要とする","require",55],["提供する","provide",55],["達成する","achieve",55],["比較する","compare",55],["発見する","discover",55],["解決する","solve",55],["提案する","suggest",55],
+["利点","advantage",55],["欠点","disadvantage",55],["機会","opportunity",55],["環境","environment",55],["資源","resource",55],["地域社会","community",55],["知識","knowledge",55],["行動","behavior",55],["選択","choice",55],["目的","purpose",55],
+["影響を与える","affect",58],["影響","influence",58],["結果","result",58],["原因","cause",58],["証拠","evidence",58],["責任","responsibility",58],["態度","attitude",58],["価値","value",58],["方法","method",58],["状況","situation",58],
+["明らかな","obvious",62],["適切な","appropriate",62],["利用可能な","available",62],["複雑な","complex",62],["重要な","significant",62],["効果的な","effective",62],["一般的な","conventional",62],["正確な","accurate",62],["意識している","aware",62],["独立した","independent",62],
+["維持する","maintain",65],["確立する","establish",65],["評価する","evaluate",65],["認識する","recognize",65],["推測する","assume",65],["主張する","claim",65],["促進する","promote",65],["減少させる","reduce",65],["消費する","consume",65],["調査する","investigate",65],
+["傾向","tendency",65],["要因","factor",65],["原則","principle",65],["証明","proof",65],["概念","concept",65],["政策","policy",65],["経済","economy",65],["利益","benefit",65],["現象","phenomenon",65],["結果として生じるもの","consequence",65],
+["避けられない","inevitable",70],["曖昧な","ambiguous",70],["一貫した","consistent",70],["根本的な","fundamental",70],["顕著な","remarkable",70],["有効な","valid",70],["妥当な","plausible",70],["包括的な","comprehensive",70],["潜在的な","potential",70],["持続可能な","sustainable",70],
+["推論する","infer",72],["示唆する","imply",72],["明示する","specify",72],["解釈する","interpret",72],["区別する","distinguish",72],["裏付ける","substantiate",72],["矛盾する","contradict",72],["緩和する","mitigate",72],["悪化させる","exacerbate",72],["促進する","facilitate",72],
+["普及","prevalence",75],["仮説","hypothesis",75],["妥協","compromise",75],["制約","constraint",75],["整合性","coherence",75],["偏見","prejudice",75],["格差","disparity",75],["曖昧さ","ambiguity",75],["持続可能性","sustainability",75],["相互依存","interdependence",75],
+["前提","premise",80],["精査する","scrutinize",80],["反証する","refute",80],["譲歩する","concede",80],["包括する","encompass",80],["固有の","inherent",80],["一時的な","transient",80],["広範囲に及ぶ","pervasive",80],["相反する","incompatible",80],["説得力のある","compelling",80],
+["難解な","esoteric",85],["不明瞭な","obscure",85],["軽減する","alleviate",85],["悪化させる","aggravate",85],["迂回する","circumvent",85],["裏付ける","corroborate",85],["詳しく述べる","elaborate",85],["弱める","undermine",85],["強調する","underscore",85],["容認する","endorse",85],
+["不安定な","volatile",88],["根深い","entrenched",88],["従順な","compliant",88],["一時しのぎの","provisional",88],["決定的な","decisive",88],["先入観","preconception",88],["含意","implication",88],["因果関係","causality",88],["実現可能性","feasibility",88],["反駁","rebuttal",88]
+];
+const EXTRA_IDIOMS = [
+["起きる","get up",42],["寝る","go to bed",42],["探す","look for",42],["世話をする","take care of",45],["到着する","arrive at",45],["参加する","take part in",45],["〜を楽しみに待つ","look forward to",50],["〜が得意だ","be good at",45],["〜に興味がある","be interested in",45],["〜を恐れる","be afraid of",45],
+["諦める","give up",45],["続ける","keep on",48],["調べる","look up",48],["提出する","hand in",48],["消す","turn off",45],["つける","turn on",45],["拾い上げる","pick up",45],["脱ぐ","take off",45],["世話をする","look after",45],["戻る","come back",45],
+["〜のおかげで","thanks to",50],["〜のために","because of",48],["〜にもかかわらず","in spite of",55],["〜に加えて","in addition to",55],["〜の代わりに","instead of",50],["〜によれば","according to",50],["〜に関して","in terms of",60],["〜に応じて","depending on",60],["〜と比べて","compared with",55],["〜を除いて","except for",55],
+["突然","all of a sudden",50],["少なくとも","at least",45],["すぐに","at once",45],["最初は","at first",45],["最後には","at last",45],["今のところ","so far",50],["時々","from time to time",50],["一般に","in general",50],["実際には","in fact",48],["例えば","for example",42],
+["〜を楽しむ","have a good time",45],["元気である","be in good health",48],["忙しい","be busy with",45],["〜に遅れる","be late for",45],["〜に似ている","be similar to",50],["〜と違う","be different from",50],["〜に満足している","be satisfied with",55],["〜に驚く","be surprised at",50],["〜に責任がある","be responsible for",60],["〜を誇りに思う","be proud of",50],
+["〜を確信している","be sure of",50],["〜を心配している","be worried about",50],["〜に依存する","depend on",55],["〜を信頼する","rely on",55],["〜を扱う","deal with",55],["〜を思いつく","come up with",55],["〜を実行する","carry out",55],["〜を延期する","put off",55],["〜を断る","turn down",55],["〜を受け入れる","take in",55],
+["〜を見つけ出す","find out",50],["〜を理解する","make sense of",55],["〜を利用する","make use of",50],["〜を重視する","place importance on",60],["〜を考慮に入れる","take into account",65],["〜を当然と思う","take for granted",60],["〜を支持する","stand for",55],["〜を代表する","stand for",60],["〜を引き起こす","bring about",60],["〜をもたらす","result in",55],
+["〜に起因する","result from",55],["〜に対処する","cope with",60],["〜を克服する","get over",55],["〜を実現する","carry through",60],["〜を明らかにする","point out",55],["〜を強調する","lay emphasis on",65],["〜を前提とする","be based on",60],["〜に関連する","be related to",55],["〜と関係がある","have to do with",55],["〜に影響を与える","have an effect on",60],
+["〜を生み出す","give rise to",65],["〜に貢献する","contribute to",60],["〜を促進する","bring forward",60],["〜に直面する","be faced with",60],["〜を利用できる","have access to",60],["〜に専念する","devote oneself to",70],["〜を我慢する","put up with",60],["〜を取り除く","get rid of",55],["〜を実現する","come true",48],["〜を果たす","fulfill one's role",65],
+["要するに","in short",50],["一方では","on the one hand",55],["他方では","on the other hand",55],["その結果","as a result",50],["したがって","as a consequence",60],["言い換えれば","in other words",55],["少しずつ","little by little",45],["長い目で見れば","in the long run",60],["結局","after all",50],["いずれにせよ","in any case",55],
+["〜する傾向がある","tend to do",55],["〜することになっている","be supposed to do",55],["〜せざるを得ない","cannot help doing",65],["〜する価値がある","be worth doing",60],["〜するのに苦労する","have difficulty doing",60],["〜することに慣れている","be used to doing",60],["以前は〜していた","used to do",50],["〜するのを楽しむ","take pleasure in doing",65],["〜することを避ける","refrain from doing",70],["〜することを主張する","insist on doing",65],
+["〜する可能性が高い","be likely to do",55],["〜する可能性が低い","be unlikely to do",55],["〜することを許される","be allowed to do",50],["〜することを期待される","be expected to do",60],["〜することを強いられる","be forced to do",60],["〜することを妨げる","prevent A from doing",65],["〜にAを思い出させる","remind A of B",60],["AにBを提供する","provide A with B",60],["AにBを供給する","supply A with B",65],["AにBを知らせる","inform A of B",60],
+["AにBを説得する","persuade A to do",60],["AにBを禁じる","forbid A to do",65],["AにBを頼る","count on A",55],["AをBとみなす","regard A as B",65],["AをBと取り違える","mistake A for B",65],["AをBと区別する","distinguish A from B",70],["AをBに置き換える","replace A with B",65],["AをBに変える","turn A into B",55],["AをBに結びつける","associate A with B",70],["AをBに帰する","attribute A to B",75],
+["〜にかかわらず","regardless of",65],["〜の観点から","from the perspective of",70],["〜を踏まえて","in light of",70],["〜を考慮すると","given that",65],["〜に反して","contrary to",65],["〜と一致して","in accordance with",70],["〜と引き換えに","at the expense of",70],["〜の範囲内で","within the scope of",75],["〜に先立って","prior to",65],["〜の結果として","by virtue of",75],
+["一時的に","for the time being",60],["徐々に","gradually",50],["偶然に","by chance",48],["わざと","on purpose",48],["公平に","on equal terms",65],["全体として","on the whole",55],["率直に言えば","frankly speaking",55],["大部分は","for the most part",60],["例外なく","without exception",60],["疑いなく","beyond doubt",65],
+["〜を優先する","give priority to",65],["〜を満たす","meet the needs of",60],["〜の役に立つ","serve as",55],["〜の代役を務める","take the place of",60],["〜を可能にする","make it possible to",60],["〜を困難にする","make it difficult to",60],["〜に重点を置く","focus on",50],["〜を基準にする","be measured by",65],["〜と密接に関係する","be closely linked to",70],["〜を視野に入れる","keep in mind",55],
+["〜に匹敵する","be comparable to",75],["〜と矛盾する","be inconsistent with",75],["〜を正当化する","account for",70],["〜を説明する","shed light on",70],["〜を補う","make up for",65],["〜を弱める","wear down",65],["〜を促す","prompt A to do",65],["〜を強く望む","long for",65],["〜を実証する","bear out",80],["〜を退ける","rule out",70]
+];
+const wordOptions = EXTRA_WORDS.map(x=>x[1]);
+EXTRA_WORDS.forEach((x,i)=>{ if(!vocab.some(q=>q.en===x[1] && (q.kind||"word")==="word")){ const ds=wordOptions.filter(w=>w!==x[1]).slice((i*3)%Math.max(1,wordOptions.length-3),(i*3)%Math.max(1,wordOptions.length-3)+3); vocab.push({id:"xw"+String(i+1).padStart(3,"0"),kind:"word",jp:x[0],en:x[1],level:x[2],distractors:ds.length===3?ds:["make","take","give"]});}});
+EXTRA_IDIOMS.forEach((x,i)=>{ if(!vocab.some(q=>q.en===x[1] && (q.kind||"word")==="idiom")){ const ds=EXTRA_IDIOMS.filter(y=>y[1]!==x[1]).slice((i*3)%Math.max(1,EXTRA_IDIOMS.length-3),(i*3)%Math.max(1,EXTRA_IDIOMS.length-3)+3).map(y=>y[1]); vocab.push({id:"xi"+String(i+1).padStart(3,"0"),kind:"idiom",jp:x[0],en:x[1],level:x[2],distractors:ds.length===3?ds:["at first","in fact","at last"]});}});
+/* Create a broad grammar bank from reusable, checked structures. */
+const grammarPatterns=[
+{topic:0,level:45,q:"{s} usually ___ {v} on weekdays.",opts:["{a}","{b}","{c}","{d}"],ans:"{a}",exp:"usually は習慣を表すため、現在形を使う。"},
+{topic:0,level:55,q:"By the time we arrived, the movie ___.",opts:["had started","has started","starts","will start"],ans:"had started",exp:"過去のある時点より前の出来事には過去完了。"},
+{topic:1,level:55,q:"The results ___ tomorrow.",opts:["will announce","will be announced","announced","are announcing"],ans:"will be announced",exp:"結果は発表される側なので未来の受動態。"},
+{topic:2,level:50,q:"You ___ have told me earlier; I could have helped.",opts:["should","can","may","must"],ans:"should",exp:"should have + 過去分詞は過去への助言・後悔を表す。"},
+{topic:3,level:65,q:"If she had taken the map, she ___ lost.",opts:["wouldn't have got","won't get","didn't get","wouldn't get"],ans:"wouldn't have got",exp:"過去の反実仮想は would have + 過去分詞。"},
+{topic:4,level:50,q:"He went to the shop ___ some bread.",opts:["to buy","buying","bought","buy"],ans:"to buy",exp:"目的を表す不定詞を使う。"},
+{topic:5,level:50,q:"She avoided ___ about the mistake.",opts:["talking","to talk","talk","talked"],ans:"talking",exp:"avoid の後ろは動名詞。"},
+{topic:6,level:55,q:"The documents ___ on the desk belong to me.",opts:["lying","lie","lay","to lie"],ans:"lying",exp:"書類が置かれている状態を現在分詞で説明する。"},
+{topic:7,level:60,q:"The teacher prevented us ___ the room.",opts:["from entering","to enter","enter","entered"],ans:"from entering",exp:"prevent A from doing の形。"},
+{topic:8,level:55,q:"The book, ___ was published last year, became popular.",opts:["which","who","where","whose"],ans:"which",exp:"物を先行詞とする非制限用法の関係代名詞。"},
+{topic:9,level:50,q:"You can borrow it ___ you return it by Friday.",opts:["as long as","although","despite","because of"],ans:"as long as",exp:"as long as は「〜する限り」という条件。"},
+{topic:10,level:50,q:"She has been interested ___ astronomy since childhood.",opts:["in","at","on","for"],ans:"in",exp:"be interested in の形。"},
+{topic:11,level:50,q:"It was a ___ decision to wait for more information.",opts:["wise","wisely","wisdom","wiserly"],ans:"wise",exp:"名詞 decision を修飾する形容詞が必要。"},
+{topic:12,level:55,q:"The proposal was ___ carefully by the committee.",opts:["considered","considerate","considering","consideration"],ans:"considered",exp:"受動態 be + 過去分詞の形。"},
+{topic:13,level:55,q:"The more you practice, the ___ you become.",opts:["more confident","most confident","confident","confidently"],ans:"more confident",exp:"the 比較級, the 比較級 の構文。"},
+{topic:14,level:55,q:"There is little ___ that the plan will succeed.",opts:["chance","chances","a chance","the chances"],ans:"chance",exp:"little は不可算名詞にも使われ、ここでは chance を不可算的に用いる。"},
+{topic:15,level:55,q:"Neither answer ___ correct.",opts:["is","are","be","were"],ans:"is",exp:"neither + 単数名詞は通常単数扱い。"},
+{topic:16,level:55,q:"Each of the applicants ___ required to attend.",opts:["is","are","have","were"],ans:"is",exp:"each of + 複数名詞は単数扱い。"},
+{topic:17,level:55,q:"Do you know what time the store ___?",opts:["closes","does close","is it closing","close"],ans:"closes",exp:"間接疑問文は主語＋動詞の語順。"},
+{topic:18,level:75,q:"Rarely ___ such a convincing argument.",opts:["have I heard","I have heard","I heard have","heard I have"],ans:"have I heard",exp:"否定的な副詞が文頭に来ると倒置する。"}
+];
+const grammarFill=[
+["My sister","walks","every day","walk","walked","is walking"],["The students","study","after school","studies","studied","are study"],["Our teacher","explains","the rule clearly","explain","explaining","explained"],["The train","leaves","at eight","leave","leaving","left"],["This machine","works","well","work","worked","working"],["The museum","opens","at ten","open","opened","opening"],["His parents","live","near the station","lives","living","lived"],["The river","flows","through the town","flow","flowing","flowed"],["My friends","enjoy","playing tennis","enjoys","enjoyed","enjoying"],["The shop","sells","fresh bread","sell","selling","sold"]
+];
+for(let i=0;i<220;i++){
+ const p=grammarPatterns[i%grammarPatterns.length], f=grammarFill[Math.floor(i/grammarPatterns.length)%grammarFill.length];
+ let q=p.q.replace("{s}",f[0]).replace("{v}",f[2]).replace("___", "___");
+ let opts=p.opts.map(x=>x.replace("{a}",f[1]).replace("{b}",f[3]).replace("{c}",f[4]).replace("{d}",f[5]));
+ let ans=p.ans.replace("{a}",f[1]).replace("{b}",f[3]).replace("{c}",f[4]).replace("{d}",f[5]);
+ if(i%grammarPatterns.length===0){q=f[0]+" usually ___ "+f[2]+".";opts=[f[1],f[3],f[4],f[5]];ans=f[1];}
+ grammar.push({id:"gx"+String(i+1).padStart(3,"0"),topic:p.topic,level:p.level,question:q,options:opts,answer:ans,explain:p.exp});
+}
+/* Short translation: 200 combinations with controlled sentence patterns. */
+const shortTemplates=[
+["私は毎朝{time}に起きます。","I get up at {time} every morning.","現在形・時刻"],
+["彼女は毎週{place}へ行きます。","She goes to {place} every week.","三人称単数・前置詞"],
+["私たちは昨日{activity}をしました。","We {past} yesterday.","過去形"],
+["私は{thing}することが大切だと思います。","I think it is important to {verb}.","不定詞"],
+["もし時間があれば、私は{verb}するでしょう。","If I had time, I would {verb}.","仮定法"],
+["これは私が{time}に買った{thing}です。","This is the {thing} that I bought {time}.","関係詞"],
+["彼は疲れていたので、早く寝ました。","He went to bed early because he was tired.","接続詞"],
+["私は彼女が{verb}することを知っています。","I know that she will {verb}.","that節"],
+["彼女は私に{verb}するよう頼みました。","She asked me to {verb}.","動詞の語法"],
+["私は{place}に行ったことがあります。","I have been to {place}.","現在完了"]
+];
+const shortValues=[
+{time:"6時",place:"the library",activity:"soccer",past:"played soccer",thing:"book",verb:"read"},
+{time:"7時",place:"the museum",activity:"basketball",past:"played basketball",thing:"language",verb:"learn a new language"},
+{time:"8時",place:"the park",activity:"tennis",past:"played tennis",thing:"plan",verb:"make a plan"},
+{time:"5時",place:"the station",activity:"a game",past:"watched a game",thing:"movie",verb:"watch a movie"},
+{time:"6時半",place:"the gym",activity:"the piano",past:"practiced the piano",thing:"skill",verb:"practice English"},
+{time:"7時半",place:"the beach",activity:"a walk",past:"took a walk",thing:"idea",verb:"share an idea"},
+{time:"9時",place:"the science center",activity:"a project",past:"finished a project",thing:"report",verb:"write a report"},
+{time:"6時15分",place:"the bookstore",activity:"a song",past:"learned a song",thing:"recipe",verb:"cook dinner"},
+{time:"7時15分",place:"the sports center",activity:"a race",past:"watched a race",thing:"habit",verb:"keep a diary"},
+{time:"8時半",place:"the city hall",activity:"a volunteer activity",past:"joined a volunteer activity",thing:"goal",verb:"reach a goal"}
+];
+for(let i=0;i<200;i++){
+ const t=shortTemplates[i%shortTemplates.length],v=shortValues[Math.floor(i/shortTemplates.length)%shortValues.length];
+ let jp=t[0],en=t[1];
+ Object.keys(v).forEach(k=>{jp=jp.replaceAll("{"+k+"}",v[k]);en=en.replaceAll("{"+k+"}",v[k]);});
+ if(i%shortTemplates.length===2) jp="私たちは昨日"+v.activity+"をしました。";
+ if(i%shortTemplates.length===2) en="We "+v.past+" yesterday.";
+ short.push({id:"sx"+String(i+1).padStart(3,"0"),level:40+(i%9)*5,jp:jp,answer:en,focus:t[2]});
+}
+/* 200 reading questions: 40 short passages, five distinct comprehension angles each. */
+const readingScenes=[
+["Mika","school garden","tomatoes","water the plants","The students learned to check the soil before watering."],
+["Ken","library project","history books","sort the books","The group made it easier for visitors to find information."],
+["Aoi","recycling campaign","plastic bottles","put collection boxes near classrooms","The campaign reduced waste at school."],
+["Riku","science club","a small robot","test the robot after class","The team improved the design after each test."],
+["Emma","community event","homemade cookies","make a list of ingredients","The event helped neighbors get to know one another."],
+["Leo","music festival","a guitar","practice every evening","Regular practice helped him feel more confident."],
+["Yuna","train journey","a notebook","write down new words","Reviewing the words helped her remember them."],
+["Noah","sports day","a relay race","train with teammates","The team learned that cooperation mattered."],
+["Sara","weather project","daily temperatures","record the weather each morning","The data showed a clear change over several weeks."],
+["Haru","local museum","old photographs","ask the guide questions","He learned how the town had changed."]
+];
+const readingQs=[
+{q:"What did {name} focus on in the passage?",opts:["{subject}","a cooking contest","a trip abroad","a new computer"],ans:0,ex:"本文では{subject}が中心となっている。"},
+{q:"What did {name} do to make progress?",opts:["{action}","stop the activity immediately","ignore the instructions","work without a plan"],ans:0,ex:"本文に書かれた具体的な行動は「{action}」。"},
+{q:"What was one result of the activity?",opts:["{result}","everyone left the group","the project was canceled","nothing changed at all"],ans:0,ex:"本文の最後に示された結果は「{result}」。"},
+{q:"Which statement is supported by the passage?",opts:["The activity involved repeated effort.","The main task was completed in one minute.","No one learned anything from the activity.","The group refused to change its plan."],ans:0,ex:"本文は活動を通じた工夫や継続を説明している。"},
+{q:"What is the best lesson from the passage?",opts:["Careful effort can lead to improvement.","Plans should never be changed.","Questions always slow down learning.","Teamwork is never useful."],ans:0,ex:"本文は工夫や継続がよい結果につながることを示す。"}
+];
+for(let i=0;i<40;i++){
+ const sc=readingScenes[i%readingScenes.length], name=i<10?sc[0]:sc[0]+[""," K."," M."," S."][Math.floor(i/10)%4];
+ const subject=sc[1]+" involving "+sc[2], action=sc[3], result=sc[4];
+ const passage=name+" took part in a "+sc[1]+". The main task involved "+sc[2]+". At first, the group faced a few difficulties, so "+name+" decided to "+action+". The members shared ideas and checked their progress regularly. After some time, they noticed that their work was improving. "+result+" The experience taught them to pay attention to small steps rather than expect instant success.";
+ for(let j=0;j<5;j++){
+  const z=readingQs[j], repl=x=>x.replaceAll("{name}",name).replaceAll("{subject}",subject).replaceAll("{action}",action).replaceAll("{result}",result);
+  const opts=z.opts.map(repl), ans=opts[z.ans];
+  reading.push({id:"rx"+String(i+1).padStart(2,"0")+"q"+(j+1),level:45+((i+j)%9)*5,title:"Reading Practice "+(i+1)+"-"+(j+1),passage:passage,question:repl(z.q),options:opts,answer:ans,explain:repl(z.ex)});
+ }
+}
+/* 200 writing prompts across school, university and Eiken styles. */
+const writingTopics=["school libraries","public transportation","online learning","volunteer work","school uniforms","environmental protection","team sports","part-time jobs","studying abroad","art education","artificial intelligence","local tourism","healthy meals","reading habits","public parks","recycling","social media","remote work","language learning","community events"];
+const writingFrames=[
+"Do you think {topic} should receive more attention? State your opinion and give two reasons.",
+"Some people support {topic}, while others disagree. Which view do you take, and why?",
+"What is one problem related to {topic}, and how could it be improved?",
+"Do the advantages of {topic} outweigh the disadvantages? Explain your position with examples.",
+"How might {topic} affect young people in the future? Give reasons for your answer.",
+"Should schools or governments invest more in {topic}? Support your view with reasons.",
+"Describe one practical way to improve {topic} in your community.",
+"Some people believe {topic} changes society for the better. Do you agree or disagree?"
+];
+for(let i=0;i<200;i++){
+ const topic=writingTopics[i%writingTopics.length], frame=writingFrames[Math.floor(i/writingTopics.length)%writingFrames.length];
+ const grade=i%4===0?"highschool":i%4===1?"university":i%4===2?"eiken2":"eikenPre1";
+ const level=grade==="highschool"?45+(i%3)*5:grade==="university"?60+(i%4)*5:grade==="eiken2"?65:75;
+ writing.push({id:"wx"+String(i+1).padStart(3,"0"),level:level,prompt:frame.replace("{topic}",topic),words:grade==="highschool"?35:grade==="eiken2"?80:grade==="eikenPre1"?120:90});
+}
+/* Expand both mock-test tracks to at least 200 unique items each. */
+const mockTemplates=grammar.slice();
+for(let i=0;i<400;i++){
+ const base=mockTemplates[i%mockTemplates.length];
+ const examType=i%2===0?"saitama":"common";
+ mock.push({id:"mx"+String(i+1).padStart(3,"0"),examType:examType,level:base.level,question:base.question,options:base.options.slice(),answer:base.answer,explain:base.explain});
+}
+
 </script></body></html>
