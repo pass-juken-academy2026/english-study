@@ -16,8 +16,9 @@
 <div class="card"><span class="tag">200題以上</span><h3>⑤ ライティング</h3><p>お題に英語で答え、語数や構成を簡易チェック。</p><button onclick="setup('writing')">始める</button></div>
 <div class="card"><span class="tag">200題以上</span><h3>⑥ 模擬テスト</h3><p>最初に「埼玉県の高校入試」か「大学受験用の共通テスト」を選んで挑戦。</p><button onclick="setup('mock')">始める</button></div>
 <div class="card"><span class="tag">文法を基礎から解説</span><h3>⑦ 文法の授業</h3><p>英文の仕組みを、例文とポイントで一つずつ理解。暗記だけでなく「なぜその形か」を学びます。</p><button onclick="setup('guide')">学習する</button></div>
-</div><div class="panel" style="margin-top:14px"><div class="head"><h3>学習履歴</h3><button class="secondary" onclick="historyPage()">履歴・苦手分野を見る</button></div><p class="muted">解いた問題はID単位で保存し、再出題しません。未出題問題が足りない場合は、ある分だけ出題します。</p><details><summary>保存について</summary><p class="muted">同じ端末・ブラウザでページを閉じても履歴を保持します。サイトデータ削除や別端末への同期には対応していません。</p><button class="danger" onclick="resetData()">履歴をすべて削除</button></details></div>
+<div class="card"><span class="tag">単語・熟語を検索</span><h3>⑧ 単語・熟語検索帳</h3><p>英語→日本語、日本語→英語で検索。日本語からは複数の英訳候補を表示します。</p><button onclick="lookupHome()">検索帳を開く</button></div></div><div class="panel" style="margin-top:14px"><div class="head"><h3>学習履歴</h3><button class="secondary" onclick="historyPage()">履歴・苦手分野を見る</button></div><p class="muted">解いた問題はID単位で保存し、再出題しません。未出題問題が足りない場合は、ある分だけ出題します。</p><details><summary>保存について</summary><p class="muted">同じ端末・ブラウザでページを閉じても履歴を保持します。サイトデータ削除や別端末への同期には対応していません。</p><button class="danger" onclick="resetData()">履歴をすべて削除</button></details></div>
 </section>
+<section id="lookup" class="panel hidden"><div class="head"><div><h2>⑧ 単語・熟語検索帳</h2><p class="muted">登録済みの単語・熟語を検索できます。日本語→英語では、同じ意味に使える英語表現を複数表示します。</p></div><button class="secondary" onclick="home()">ホームへ</button></div><div class="row"><div><label for="lookupDirection">検索方向</label><select id="lookupDirection" onchange="doLookup()"><option value="en-ja">英語 → 日本語</option><option value="ja-en">日本語 → 英語</option></select></div><div><label for="lookupKind">種類</label><select id="lookupKind" onchange="doLookup()"><option value="both">単語＋熟語</option><option value="word">単語だけ</option><option value="idiom">熟語だけ</option></select></div></div><label for="lookupQuery">検索する語句</label><input id="lookupQuery" placeholder="例：run / 走る / look for" oninput="doLookup()" autocomplete="off"><div class="actions"><button class="secondary" onclick="clearLookup()">クリア</button></div><div id="lookupCount" class="muted" style="margin-top:12px"></div><div id="lookupResults"></div></section>
 <section id="setup" class="panel hidden"><div class="head"><h2 id="setupTitle">設定</h2><button class="secondary" onclick="home()">ホームへ</button></div><div id="setupBody"></div><div class="actions"><button onclick="start()">開始する</button></div></section>
 <section id="quiz" class="panel hidden"><div class="head"><div><h2 id="quizTitle">練習</h2><div class="muted" id="quizSub"></div></div><button class="secondary" onclick="home()">中断してホームへ</button></div><div class="progress"><span id="bar"></span></div><div id="quizBody"></div></section>
 <section id="results" class="panel hidden"><div class="head"><h2>今回の結果</h2><button class="secondary" onclick="home()">ホームへ</button></div><div id="resultBody"></div><div id="resultActions" class="actions"></div></section>
@@ -618,6 +619,36 @@ for(let i=0;i<400;i++){
  const base=mockTemplates[i%mockTemplates.length];
  const examType=i%2===0?"saitama":"common";
  mock.push({id:"mx"+String(i+1).padStart(3,"0"),examType:examType,level:base.level,question:base.question,options:base.options.slice(),answer:base.answer,explain:base.explain});
+}
+
+
+function lookupHome(){hide();$("lookup").classList.remove("hidden");$("lookupQuery").value="";$("lookupDirection").value="en-ja";$("lookupKind").value="both";doLookup();$("lookupQuery").focus()}
+function clearLookup(){$("lookupQuery").value="";doLookup();$("lookupQuery").focus()}
+function doLookup(){
+ const query=norm($("lookupQuery")?.value||"");
+ const direction=$("lookupDirection")?.value||"en-ja";
+ const kind=$("lookupKind")?.value||"both";
+ const pool=vocab.filter(q=>kind==="both"||((q.kind||"word")===kind));
+ if(!query){$("lookupCount").textContent=pool.length+"件を登録中。英語または日本語を入力して検索してください。";$("lookupResults").innerHTML='<p class="muted">検索語を入力すると、候補がここに表示されます。</p>';return}
+ const field=direction==="en-ja"?"en":"jp";
+ const found=pool.filter(q=>norm(q[field]).includes(query)).sort((a,b)=>(a.level||0)-(b.level||0));
+ $("lookupCount").textContent=found.length+"件見つかりました";
+ if(!found.length){$("lookupResults").innerHTML='<div class="note">一致する項目がありません。別の表記や短い語句で試してください。</div>';return}
+ const groups=[];
+ for(const q of found){
+   const key=direction==="ja-en"?norm(q.jp):norm(q.en);
+   let g=groups.find(x=>x.key===key);
+   if(!g){g={key,main:direction==="ja-en"?q.jp:q.en,items:[]};groups.push(g)}
+   if(!g.items.some(x=>x.en===q.en&&x.jp===q.jp&&(x.kind||"word")===(q.kind||"word")))g.items.push(q);
+ }
+ $("lookupResults").innerHTML=groups.slice(0,100).map(g=>{
+   const unique=arr=>[...new Set(arr)];
+   const kinds=unique(g.items.map(x=>(x.kind||"word")==="idiom"?"熟語":"単語"));
+   const translations=direction==="ja-en"?unique(g.items.map(x=>x.en)):unique(g.items.map(x=>x.jp));
+   const opposite=direction==="ja-en"?"英訳候補":"日本語の意味";
+   const levels=unique(g.items.map(x=>x.level).filter(x=>x!==undefined)).sort((a,b)=>a-b);
+   return '<div class="resultrow"><div class="head"><b>'+esc(g.main)+'</b><span class="tag">'+esc(kinds.join("・"))+'</span></div><p style="margin:8px 0 4px"><b>'+opposite+'：</b>'+translations.map(esc).join(" ／ ")+'</p><div class="muted" style="font-size:.85rem">難易度目安：'+(levels.length?esc(levels.map(l=>l>=80?"東大レベル":l>=70?"難関大学":l>=60?"標準〜発展":"基礎〜標準").join("・")):"—")+'</div></div>'
+ }).join("")+(groups.length>100?'<p class="muted">表示は先頭100グループまでです。より具体的な語句で絞り込んでください。</p>':"");
 }
 
 </script></body></html>
