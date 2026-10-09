@@ -133,9 +133,11 @@ $("resultActions").innerHTML=(missed.length?'<button onclick="retryMissed()">間
 }
 function weakGrammar(){
 cfg={topics:data.weak,score:55};mode="grammar";
-items=grammar.filter(q=>cfg.topics.includes(q.topic)&&(!data.solved[q.id]||data.solved[q.id].correct===false)).slice(0,20);
-if(!items.length){alert("苦手分野の未出題・不正解問題がありません。文法メニューから分野を選んで練習できます。");home();return}
-idx=0;answers=[];hide();$("quiz").classList.remove("hidden");$("quizTitle").textContent="苦手分野だけ再テスト";$("quizSub").textContent=items.length+"問 / 苦手分野の未出題・不正解問題";render();
+// 苦手分野に属する「まだ一度も出題していない問題」だけを使う。
+// 前回間違えた問題をそのまま再利用せず、同じ分野の別問題で理解を確認する。
+items=shuffle(grammar.filter(q=>cfg.topics.includes(q.topic)&&!data.solved[q.id])).slice(0,20);
+if(!items.length){alert("苦手分野の新しい問題がありません。今回は同じ問題を繰り返さず、文法メニューから別の分野も練習できます。");home();return}
+idx=0;answers=[];hide();$("quiz").classList.remove("hidden");$("quizTitle").textContent="苦手分野・別問題テスト";$("quizSub").textContent=items.length+"問 / 苦手分野の未出題問題";render();
 }
 function historyPage(){
 hide();$("history").classList.remove("hidden");
@@ -198,7 +200,27 @@ const grammar=[
 {id:"g37",topic:7,level:65,question:"The doctor advised him ___ smoking.",options:["stop","stopping","to stop","stopped"],answer:"to stop",explain:"advise + 人 + to do。"},
 {id:"g38",topic:8,level:65,question:"The book ___ cover is blue belongs to me.",options:["who","whose","where","whom"],answer:"whose",explain:"所有を表す関係詞 whose。"},
 {id:"g39",topic:9,level:60,question:"You can go out ___ you finish your homework.",options:["as soon as","although","because of","despite"],answer:"as soon as",explain:"「宿題を終えたらすぐに」は as soon as。"},
-{id:"g40",topic:18,level:65,question:"Not until midnight ___ home.",options:["he returned","did he return","he did return","returned he"],answer:"did he return",explain:"Not until が文頭に来ると倒置する。"}
+{id:"g40",topic:18,level:65,question:"Not until midnight ___ home.",options:["he returned","did he return","he did return","returned he"],answer:"did he return",explain:"Not until が文頭に来ると倒置する。"},
+{id:"g41",topic:0,level:50,question:"By the time we arrived, the movie ___.",options:["starts","has started","had started","was starting"],answer:"had started",explain:"過去の到着より前に始まっていたので過去完了。"},
+{id:"g42",topic:1,level:55,question:"The emails ___ by the manager yesterday.",options:["sent","were sent","are sending","have send"],answer:"were sent",explain:"yesterday の過去の受動態は were + 過去分詞。"},
+{id:"g43",topic:2,level:50,question:"You ___ park here. It is prohibited.",options:["don't have to","mustn't","might","would"],answer:"mustn't",explain:"禁止は mustn't。don't have to は「する必要がない」。"},
+{id:"g44",topic:3,level:55,question:"If it ___ tomorrow, we will stay home.",options:["rained","rains","will rain","would rain"],answer:"rains",explain:"現実的な未来の条件を表す if 節は現在形。"},
+{id:"g45",topic:4,level:50,question:"She decided ___ a new language.",options:["learn","learning","to learn","learned"],answer:"to learn",explain:"decide の後ろは to 不定詞。"},
+{id:"g46",topic:5,level:55,question:"He avoided ___ about the mistake.",options:["talk","to talk","talking","talked"],answer:"talking",explain:"avoid の後ろは動名詞。"},
+{id:"g47",topic:6,level:55,question:"The students ___ in the library are preparing for the exam.",options:["study","studying","studied","to study"],answer:"studying",explain:"図書館で勉強している生徒を現在分詞で修飾。"},
+{id:"g48",topic:7,level:55,question:"This medicine prevents you ___ getting sick.",options:["from","to","for","with"],answer:"from",explain:"prevent A from doing の形。"},
+{id:"g49",topic:8,level:55,question:"The person to ___ I spoke was very kind.",options:["who","whom","whose","which"],answer:"whom",explain:"前置詞 to の後ろで人を表す目的格 whom。"},
+{id:"g50",topic:9,level:55,question:"Wait here ___ I come back.",options:["until","although","because","unless"],answer:"until",explain:"「私が戻るまで」は until。"},
+{id:"g51",topic:10,level:50,question:"My sister is interested ___ science.",options:["at","on","in","with"],answer:"in",explain:"be interested in の形。"},
+{id:"g52",topic:11,level:50,question:"We need a ___ explanation.",options:["clearly","clear","clearness","clearing"],answer:"clear",explain:"名詞 explanation を修飾する形容詞が必要。"},
+{id:"g53",topic:12,level:55,question:"The train arrived ___ late because of the snow.",options:["slight","slightly","slighted","slighting"],answer:"slightly",explain:"形容詞 late を修飾する副詞 slightly。"},
+{id:"g54",topic:13,level:55,question:"My room is not as ___ as yours.",options:["large","larger","largest","more large"],answer:"large",explain:"as ... as の間は形容詞・副詞の原級。"},
+{id:"g55",topic:14,level:55,question:"There isn't ___ milk left in the fridge.",options:["many","a few","much","several"],answer:"much",explain:"milk は不可算名詞なので much を使う。"},
+{id:"g56",topic:15,level:50,question:"This pen is not mine. It is ___.",options:["her","hers","she","herself"],answer:"hers",explain:"所有代名詞 hers は「彼女のもの」。"},
+{id:"g57",topic:16,level:55,question:"Neither of the answers ___ correct.",options:["are","were","is","have"],answer:"is",explain:"neither of は通常単数扱い。"},
+{id:"g58",topic:17,level:50,question:"Where ___ your parents live?",options:["does","do","are","is"],answer:"do",explain:"主語 your parents は複数なので do を使う。"},
+{id:"g59",topic:18,level:60,question:"Only after the lesson ___ what the rule meant.",options:["I understood","did I understand","I did understood","understood I"],answer:"did I understand",explain:"Only after が文頭に来ると主節は倒置する。"}
+
 ];
 const short=[
 {id:"s01",level:45,jp:"私は毎朝6時に起きます。",answer:"I get up at six every morning.",focus:"現在形・語順"},
