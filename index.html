@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>English Study Lab</title>
+<style>
+:root{font-family:system-ui,sans-serif;color:#182235;background:#f4f7fb}*{box-sizing:border-box}body{margin:0}header{background:linear-gradient(120deg,#172554,#2457d6);color:white;padding:24px}header div,main{max-width:980px;margin:auto}main{padding:18px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.card,.panel{background:white;border:1px solid #dbe3ef;border-radius:14px;padding:16px;margin-bottom:12px}.card{display:flex;flex-direction:column;gap:8px;min-height:160px}.muted{color:#64748b}button,select,input,textarea{font:inherit;padding:10px;border-radius:9px;border:1px solid #cbd5e1}button{background:#2457d6;color:white;border:0;cursor:pointer;font-weight:650}button.secondary{background:#edf1f7;color:#263449}label{display:block;margin:10px 0 5px;font-weight:650}.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}input,select,textarea{width:100%}.hidden{display:none!important}.question{font-size:1.15rem;font-weight:750;margin:18px 0}.opt{display:block;border:1px solid #dbe3ef;border-radius:9px;padding:10px;margin:8px 0}.good{color:#17663d;background:#e8f7ef;padding:12px;border-radius:9px}.bad{color:#9b2419;background:#fff0ee;padding:12px;border-radius:9px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}.tag{color:#2447a4;background:#eaf0ff;border-radius:99px;padding:3px 8px;width:max-content;font-size:.8rem}small{color:#64748b}
+</style></head><body><header><div><h1>English Study Lab</h1><p>単語・文法・短文・長文・英作文・模擬テスト</p></div></header><main>
+<section id="home"><h2>学習メニュー</h2><p class="muted">学習履歴はこのブラウザに保存されます。解いた問題は同じ問題セットでは再出題しません。</p><div class="grid">
+<div class="card"><span class="tag">20問まで</span><h3>① 英単語</h3><p>受験区分と偏差値帯を選び、単語を練習。</p><button onclick="setup('vocab')">始める</button></div>
+<div class="card"><span class="tag">20問まで</span><h3>② 文法</h3><p>文法問題に挑戦し、解説を確認。</p><button onclick="setup('grammar')">始める</button></div>
+<div class="card"><span class="tag">短文</span><h3>③ 短文問題</h3><p>日本語を英語に訳す練習。</p><button onclick="setup('short')">始める</button></div>
+<div class="card"><span class="tag">長文</span><h3>④ 長文読解</h3><p>英文を読んで内容理解を確認。</p><button onclick="setup('reading')">始める</button></div>
+<div class="card"><span class="tag">英作文</span><h3>⑤ ライティング</h3><p>お題に英語で答え、語数を確認。</p><button onclick="setup('writing')">始める</button></div>
+<div class="card"><span class="tag">模擬テスト</span><h3>⑥ 模擬テスト</h3><p>埼玉県の高校入試／大学受験用の共通テストを選択。</p><button onclick="setup('mock')">始める</button></div>
+</div><div class="panel"><b>学習履歴</b><p id="stats" class="muted">まだ解答履歴はありません。</p><button class="secondary" onclick="if(confirm('履歴を削除しますか？')){localStorage.removeItem('esl');location.reload()}">履歴を削除</button></div></section>
+<section id="setup" class="panel hidden"><button class="secondary" onclick="home()">← ホーム</button><h2 id="stitle"></h2><div id="sbody"></div><div class="actions"><button onclick="start()">開始する</button></div></section>
+<section id="quiz" class="panel hidden"><div class="row"><h2 id="qtitle"></h2><p id="qcount" class="muted"></p></div><div id="qbody"></div><div class="actions"><button id="check" onclick="check()">答え合わせ</button><button class="secondary hidden" id="next" onclick="next()">次へ</button><button class="secondary" onclick="home()">ホームへ</button></div></section>
+<section id="result" class="panel hidden"><h2>今回の結果</h2><div id="rbody"></div><button onclick="home()">ホームへ</button></section>
+<p class="muted"><small>試作版です。英作文は語数の簡易チェックのみです。入試の過去問そのものではなく、練習用のオリジナル問題です。</small></p>
+</main><script>
+const $=id=>document.getElementById(id);let mode='',cfg={},items=[],i=0,score=0,locked=false;const KEY='esl';let hist=JSON.parse(localStorage.getItem(KEY)||'{}');
+const vocab=[
+['important','重要な',45],['environment','環境',50],['improve','改善する',50],['although','〜だけれども',55],['experience','経験',55],['opportunity','機会',60],['probably','おそらく',60],['provide','提供する',60],['necessary','必要な',55],['develop','発達させる',55],['purpose','目的',60],['compare','比較する',55],['suggest','提案する',60],['increase','増加する',60],['knowledge','知識',60],['decision','決定',55],['community','地域社会',60],['recognize','認識する',65],['available','利用できる',60],['effect','影響・効果',55],['achieve','達成する',65],['likely','ありそうな',60],['instead','その代わりに',55],['reduce','減らす',55],['especially','特に',55]
+];
+const grammar=[
+['She ___ to school every day.','goes',['go','goes','going','gone'],'goes','主語が She なので三人称単数現在。',45],
+['We ___ dinner when he arrived.','were having',['have','had','were having','are having'],'were having','到着した時に食事中だったので過去進行形。',55],
+['This book ___ by many students.','is read',['reads','is read','read','is reading'],'is read','「読まれる」という受動態。',50],
+['If I had more time, I ___ tennis.','would play',['will play','played','would play','would have played'],'would play','現在の事実と異なる仮定は If + 過去形, would + 動詞。',60],
+['I enjoy ___ English songs.','listening to',['listen','to listen','listening to','listened'],'listening to','enjoy の後ろは動名詞。',50],
+['The girl ___ lives next door is kind.','who',['which','who','whose','where'],'who','人を先行詞にする主格の関係代名詞。',55],
+['This is the ___ of the two.','better',['good','best','better','more good'],'better','2つを比べるときは比較級。',50],
+['He was tired, ___ he finished his work.','but',['because','but','unless','so that'],'but','逆接なので but。',45],
+['I have lived here ___ 2020.','since',['for','during','since','from'],'since','開始時点には since。',55],
+['She asked me ___ the window.','to open',['open','opening','to open','opened'],'to open','ask 人 to do の形。',60],
+['Neither Tom nor his friends ___ ready.','are',['is','are','was','be'],'are','neither A nor B は近い主語に動詞を一致させる。',65],
+['Hardly ___ started when it began to rain.','had we',['we had','had we','we have','did we had'],'had we','Hardly が文頭に来る倒置。',70]
+];
+const shortQ=[
+['私は毎朝6時に起きます。','I get up at six every morning.'],
+['彼女は昨日、駅で友達に会いました。','She met her friend at the station yesterday.'],
+['時間があれば、私はあなたを手伝うのに。','If I had time, I would help you.'],
+['これは私が昨日買った本です。','This is the book that I bought yesterday.']
+];
+const readings=[
+{p:'Mika used to buy bottled water every day. After learning about plastic waste, she began carrying a reusable bottle. At first, she sometimes forgot it, so she put it next to her school bag every night. After a month, the habit became easy.',q:'Why did Mika put the bottle next to her school bag?',o:['To remember to take it to school','To keep it cold','To show it to a teacher','To avoid drinking water'],a:0,e:'忘れないように、学校のバッグの横に置きました。'},
+{p:'A group of students disagreed about how to present a science project. Some wanted a poster, while others preferred a video. They listed the advantages of both ideas and finally made a video with a small poster.',q:'What did the students do before deciding?',o:['Listed the advantages of both ideas','Stopped the project','Asked another class to do it','Chose the first idea immediately'],a:0,e:'決める前に両方の案の利点を整理しました。'}
+];
+const mock=[
+{exam:'saitama',q:'She usually ___ breakfast at seven.',o:['has','have','is have','having'],a:0,e:'She は三人称単数なので has。',lv:45},
+{exam:'saitama',q:'I have a lot of homework ___ tonight.',o:['do','doing','to do','did'],a:2,e:'homework to do で「するべき宿題」。',lv:55},
+{exam:'saitama',q:'The man ___ car was stolen called the police.',o:['who','whose','which','where'],a:1,e:'所有を表す関係詞 whose。',lv:55},
+{exam:'saitama',q:'You can borrow my notes ___ you return them tomorrow.',o:['as long as','even though','so that','because of'],a:0,e:'as long as は「〜する限り」。',lv:60},
+{exam:'saitama',q:'The meeting will begin ___ 9:30.',o:['in','on','at','by'],a:2,e:'時刻の前は at。',lv:50},
+{exam:'common',q:'If I had known about the event, I ___ there.',o:['would go','will go','would have gone','went'],a:2,e:'過去の事実と異なる仮定は would have + 過去分詞。',lv:65},
+{exam:'common',q:'A number of students ___ absent today.',o:['is','are','was','has'],a:1,e:'a number of + 複数名詞は複数扱い。',lv:60},
+{exam:'common',q:'The instructions were explained ___, so everyone understood them.',o:['clear','clearly','clearness','clearing'],a:1,e:'explained を修飾する副詞 clearly。',lv:60},
+{exam:'common',q:'Ken listened to the same podcast several times and wrote down useful expressions. What helped him improve?',o:['Repeating the same episode','Changing podcasts every minute','Avoiding new words','Studying only on weekends'],a:0,e:'同じエピソードを何度も聞いて表現を書き留めました。',lv:55},
+{exam:'common',q:'Choose the best order: (A) because it was raining (B) we stayed home (C) heavily.',o:['B-A-C','A-B-C','C-B-A','B-C-A'],a:0,e:'we stayed home because it was raining heavily が自然な語順。',lv:60}
+];
+function home(){['home','setup','quiz','result'].forEach(x=>$(x).classList.add('hidden'));$('home').classList.remove('hidden');let n=Object.keys(hist).length;$('stats').textContent=n?'解答済み問題：'+n+'問':'まだ解答履歴はありません。'}
+function setup(m){mode=m;['home','quiz','result'].forEach(x=>$(x).classList.add('hidden'));$('setup').classList.remove('hidden');$('stitle').textContent=({'vocab':'① 英単語の設定','grammar':'② 文法の設定','short':'③ 短文問題','reading':'④ 長文読解','writing':'⑤ ライティング','mock':'⑥ 模擬テスト'})[m];let s='';
+if(m==='vocab')s='<div class="row"><div><label>受験コース</label><select id="examType" onchange="bands()"><option value="">選択してください</option><option value="highschool">高校受験用</option><option value="university">大学受験用</option></select></div><div><label>偏差値帯コース</label><select id="band" disabled><option>先に受験コースを選んでください</option></select></div></div><div class="row"><div><label>出題方向</label><select id="dir"><option value="mix">ミックス</option><option value="ja-en">日本語→英語</option><option value="en-ja">英語→日本語</option></select></div><div><label>解答形式</label><select id="vtype"><option value="choice">4択</option><option value="typed">入力式</option></select></div></div>';
+if(m==='mock')s='<label>受験する試験</label><select id="examType"><option value="">選択してください</option><option value="saitama">埼玉県の高校入試</option><option value="common">大学受験用の共通テスト</option></select><p class="muted">試験区分に合った練習問題を出題します。</p>';
+if(m==='grammar')s='<p>文法の4択問題を出題します。各問題の解説も表示します。</p>';
+if(m==='short')s='<p>日本語を英語に訳してください。</p>';
+if(m==='reading')s='<p>英文を読んで内容理解の問題に答えます。</p>';
+if(m==='writing')s='<p>お題に英語で答えます。語数の目安を確認します。</p><div class="muted">お題：Some people prefer studying alone, while others prefer studying with friends. Which do you prefer, and why?</div>';
+$('sbody').innerHTML=s}
+function bands(){let ex=$('examType').value,b=$('band');let a=ex==='highschool'?[[45,'40〜49'],[52,'50〜54'],[57,'55〜59'],[62,'60以上']]:ex==='university'?[[45,'40〜49'],[52,'50〜54'],[57,'55〜59'],[62,'60〜64'],[67,'65〜69'],[72,'70以上']]:[];b.innerHTML='<option value="">偏差値帯を選択してください</option>'+a.map(x=>'<option value="'+x[0]+'">'+x[1]+'</option>').join('');b.disabled=!ex}
+function start(){cfg={};if(mode==='vocab'){cfg.exam=$('examType').value;cfg.band=+$('band').value;if(!cfg.exam||!cfg.band)return alert('受験コースと偏差値帯を選んでください');cfg.dir=$('dir').value;cfg.type=$('vtype').value}
+if(mode==='mock'){cfg.exam=$('examType').value;if(!cfg.exam)return alert('受験する試験を選んでください')}
+if(mode==='writing'){['home','setup','quiz'].forEach(x=>$(x).classList.add('hidden'));$('result').classList.remove('hidden');$('rbody').innerHTML='<h3>英作文</h3><p>Some people prefer studying alone, while others prefer studying with friends. Which do you prefer, and why?</p><textarea id="essay" rows="7" placeholder="Write your answer in English."></textarea><p id="wc" class="muted">語数：0</p><button onclick="wordcount()">語数を確認</button>';return}
+if(mode==='vocab'){items=vocab.filter(x=>x[2]<=cfg.band+5).filter(x=>!hist['v'+x[0]]).slice(0,20).map(x=>({id:'v'+x[0],q:cfg.dir==='en-ja'?x[0]:x[1],a:cfg.dir==='en-ja'?x[1]:x[0],options:vocab.filter(y=>y[0]!==x[0]).sort(()=>Math.random()-.5).slice(0,3).map(y=>cfg.dir==='en-ja'?y[1]:y[0]).concat(cfg.dir==='en-ja'?x[1]:x[0]).sort(()=>Math.random()-.5),ex:'単語の意味を確認しましょう。',typed:cfg.type==='typed'}))}
+if(mode==='grammar')items=grammar.filter(x=>!hist['g'+x[0]]).slice(0,20).map((x,j)=>({id:'g'+x[0],q:x[0],options:x[2],a:x[3],ex:x[4]}));
+if(mode==='short')items=shortQ.filter((x,j)=>!hist['s'+j]).slice(0,3).map((x,j)=>({id:'s'+j,q:x[0],a:x[1],typed:true,ex:'例：'+x[1]}));
+if(mode==='reading')items=readings.filter((x,j)=>!hist['r'+j]).slice(0,1).map((x,j)=>({id:'r'+j,passage:x.p,q:x.q,options:x.o,a:x.o[x.a],ex:x.e}));
+if(mode==='mock')items=mock.filter(x=>x.exam===cfg.exam&&!hist['m'+x.q]).map(x=>({id:'m'+x.q,q:x.q,options:x.o,a:x.o[x.a],ex:x.e}));
+if(!items.length)return alert('このコースの未出題問題はありません。今後、問題を追加できます。');
+i=0;score=0;['home','setup','result'].forEach(x=>$(x).classList.add('hidden'));$('quiz').classList.remove('hidden');$('qtitle').textContent=({'vocab':'英単語','grammar':'文法','short':'短文問題','reading':'長文読解','mock':cfg.exam==='saitama'?'埼玉県の高校入試 模擬テスト':'大学入学共通テスト 模擬テスト'})[mode];render()}
+function render(){locked=false;let x=items[i];$('qcount').textContent=(i+1)+' / '+items.length+'問';$('check').classList.remove('hidden');$('next').classList.add('hidden');$('qbody').innerHTML=(x.passage?'<div class="panel">'+x.passage+'</div>':'')+'<div class="question">'+x.q+'</div>'+(x.typed?'<input id="answer" placeholder="英語で入力">':x.options.map(o=>'<label class="opt"><input type="radio" name="ans" value="'+o.replace(/"/g,'&quot;')+'"> '+o+'</label>').join(''))+'<div id="feedback"></div>'}
+function check(){if(locked)return;let x=items[i],ans=x.typed?($('answer').value||'').trim():document.querySelector('input[name=ans]:checked')?.value;if(!ans)return alert('回答を入力・選択してください');let ok=ans.toLowerCase().replace(/[.!?]/g,'')===x.a.toLowerCase().replace(/[.!?]/g,'');if(ok)score++;hist[x.id]=true;localStorage.setItem(KEY,JSON.stringify(hist));locked=true;$('feedback').innerHTML='<div class="'+(ok?'good':'bad')+'">'+(ok?'正解！':'正解：'+x.a)+'<br>'+x.ex+'</div>';$('check').classList.add('hidden');$('next').classList.remove('hidden')}
+function next(){if(i<items.length-1){i++;render()}else{['quiz'].forEach(x=>$(x).classList.add('hidden'));$('result').classList.remove('hidden');$('rbody').innerHTML='<p class="question">'+score+' / '+items.length+'問正解</p><p>解説を確認して、間違えた問題を復習しよう。</p>';homeAfterResult()}}
+function homeAfterResult(){$('result').classList.remove('hidden');$('home').classList.add('hidden');$('setup').classList.add('hidden')}
+function wordcount(){let n=($('essay').value.trim().match(/[A-Za-z]+(?:['’-][A-Za-z]+)*/g)||[]).length;$('wc').textContent='語数：'+n+'語（お題の目安は約60語）'}
+home();
+</script></body></html>
