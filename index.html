@@ -24,8 +24,9 @@
 <script>
 const TOPICS=["時制","受動態","助動詞","仮定法","不定詞","動名詞","分詞","動詞の語法","関係詞","接続詞","前置詞","形容詞の用法","副詞の用法","比較","名詞の用法","代名詞の用法","主語と動詞の一致","疑問文","否定・倒置・省略・強調"];
 const $=id=>document.getElementById(id),KEY="englishStudyLab_v1";
-const blank=()=>({solved:{},attempts:[],topicStats:{},weak:[]});
+const blank=()=>({solved:{},attempts:[],topicStats:{},weak:[],weakAreas:[]});
 let data;try{data=JSON.parse(localStorage.getItem(KEY))||blank()}catch(e){data=blank()}
+data.weak ||= [];data.weakAreas ||= [];data.topicStats ||= {};data.solved ||= {};data.attempts ||= [];
 function save(){localStorage.setItem(KEY,JSON.stringify(data));stats()}
 function stats(){$("solvedCount").textContent=Object.keys(data.solved).length;let t=0,c=0;Object.values(data.topicStats).forEach(x=>{t+=x.total;c+=x.correct});$("grammarRate").textContent=t?Math.round(c/t*100)+"%":"—"}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
@@ -111,6 +112,7 @@ const rate=Math.round(v.c/v.t*100);
 return '<div class="resultrow">'+esc(name)+'：'+v.c+'/'+v.t+'（'+rate+'%）'+(rate<70?' ・復習おすすめ':'')+'</div>';
 }).join('');
 const weakCats=Object.entries(byCategory).filter(([name,v])=>v.c/v.t<.7).map(([name])=>name);
+data.weakAreas=weakCats;save();
 if(weakCats.length)html+='<p class="note">今回の弱点候補：'+weakCats.map(esc).join('、')+'。下の「間違えた問題だけ再テスト」で重点復習できます。</p>';
 if(mode==="grammar"){
 let by={};
@@ -124,12 +126,47 @@ const missed=answers.filter(a=>!a.correct);
 if(!missed.length)html+='<p class="feedback good">全問正解！この調子で続けよう。</p>';
 else html+=missed.map((a,i)=>{
 const prompt=a.q.question||a.q.jp||a.q.title||a.q.prompt||'問題';
-return '<details class="resultrow" open><summary>'+ (i+1)+'. '+esc(prompt)+' — 要復習</summary><p>あなたの答え：'+esc(a.raw)+'</p><p>正解・解答例：'+esc(a.answer)+'</p>'+(a.q.explain?'<p>解説：'+esc(a.q.explain)+'</p>':'')+(a.q.focus?'<p>ポイント：'+esc(a.q.focus)+'</p>':'')+'</details>';
+return '<details class="resultrow" open><summary>'+ (i+1)+'. '+esc(prompt)+' — 要復習</summary><p>あなたの答え：'+esc(a.raw)+'</p><p>正解・解答例：'+esc(a.answer)+'</p>'+(a.q.explain?'<p>解説：'+esc(a.q.explain)+'</p>':(mode==="vocab"?'<p>単語：'+esc(a.q.jp)+' = '+esc(a.q.en)+'</p>':''))+(a.q.focus?'<p>ポイント：'+esc(a.q.focus)+'</p>':'')+'</details>';
 }).join('');
 html+='<h3>全問題の振り返り</h3>';
-html+=answers.map((a,i)=>'<details class="resultrow"><summary>'+(i+1)+'. '+esc(a.q.question||a.q.jp||a.q.title||a.q.prompt||'問題')+' — '+(a.correct?'正解':'要復習')+'</summary><p>あなたの答え：'+esc(a.raw)+'</p><p>正解・解答例：'+esc(a.answer)+'</p>'+(a.q.explain?'<p>解説：'+esc(a.q.explain)+'</p>':'')+'</details>').join('');
+html+=answers.map((a,i)=>'<details class="resultrow"><summary>'+(i+1)+'. '+esc(a.q.question||a.q.jp||a.q.title||a.q.prompt||'問題')+' — '+(a.correct?'正解':'要復習')+'</summary><p>あなたの答え：'+esc(a.raw)+'</p><p>正解・解答例：'+esc(a.answer)+'</p>'+(a.q.explain?'<p>解説：'+esc(a.q.explain)+'</p>':(mode==="vocab"?'<p>単語：'+esc(a.q.jp)+' = '+esc(a.q.en)+'</p>':''))+'</details>').join('');
 $("resultBody").innerHTML=html;
-$("resultActions").innerHTML=(missed.length?'<button onclick="retryMissed()">間違えた問題だけ再テスト（'+missed.length+'問）</button>':'')+(mode==="grammar"&&data.weak.length?'<button onclick="weakGrammar()">苦手文法だけ再テスト</button>':'')+'<button class="secondary" onclick="home()">ホームへ戻る</button>';
+$("resultActions").innerHTML=(missed.length?'<button onclick="retryMissed()">間違えた問題だけ再テスト（'+missed.length+'問）</button>':'')+((data.weakAreas||[]).length?'<button onclick="retryWeakAreas()">弱点分野を別問題で再テスト</button>':'')+((mode==="grammar"&&data.weak.length&&!(data.weakAreas||[]).length)?'<button onclick="weakGrammar()">苦手文法だけ再テスト</button>':'')+'<button class="secondary" onclick="home()">ホームへ戻る</button>';
+}
+function retryWeakAreas(){
+const cats=data.weakAreas||[];
+if(!cats.length){alert("今回の結果から再テストできる弱点分野がありません。");return}
+let pool=[],nextMode="";
+if(cats.some(c=>TOPICS.includes(c))){
+ nextMode="grammar";
+ pool=grammar.filter(q=>cats.includes(TOPICS[q.topic])&&!data.solved[q.id]);
+}else if(cats.includes("英単語")){
+ nextMode="vocab";
+ pool=vocab.filter(q=>!data.solved[q.id]);
+}else if(cats.includes("短文英訳")){
+ nextMode="short";
+ pool=short.filter(q=>!data.solved[q.id]);
+}else if(cats.includes("長文読解")){
+ nextMode="reading";
+ pool=reading.filter(q=>!data.solved[q.id]);
+}else if(cats.includes("英作文")){
+ nextMode="writing";
+ pool=writing.filter(q=>!data.solved[q.id]);
+}else if(cats.includes("埼玉県高校入試")){
+ nextMode="mock";cfg.mockType="saitama";
+ pool=mock.filter(q=>q.examType==="saitama"&&!data.solved[q.id]);
+}else if(cats.includes("共通テスト英語")){
+ nextMode="mock";cfg.mockType="common";
+ pool=mock.filter(q=>q.examType==="common"&&!data.solved[q.id]);
+}
+if(!pool.length){alert("この弱点分野には未出題の別問題が残っていません。同じ問題は繰り返さず、別の分野を選んで練習してください。");return}
+mode=nextMode;
+items=shuffle(pool).slice(0,({vocab:20,grammar:20,short:3,reading:1,writing:1,mock:10})[mode]);
+idx=0;answers=[];
+hide();$("quiz").classList.remove("hidden");
+$("quizTitle").textContent="弱点分野・別問題テスト";
+$("quizSub").textContent=items.length+"問 / "+cats.join("・")+" の未出題問題";
+render();
 }
 function weakGrammar(){
 cfg={topics:data.weak,score:55};mode="grammar";
