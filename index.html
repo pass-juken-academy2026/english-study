@@ -53,7 +53,7 @@ function updateVocabBands(){const exam=$("examType")?.value,band=$("band");if(!b
 const bandMid=v=>v==="all"?55:+v;
 function start(){if(mode==="guide"){const topic=$("guideTopic")?.value||"all";items=GUIDE_LESSONS.filter(x=>topic==="all"||x.topic===topic);if(!items.length){alert("テーマが見つかりません");return}cfg={guideTopic:topic};idx=0;hide();$("quiz").classList.remove("hidden");$("quizTitle").textContent="⑦ 文法の授業";$("quizSub").textContent=items.length+"テーマ / オリジナル解説";renderGuide();return}if(mode==="vocab"&&(!$('examType').value||!$('band').value)){alert("高校受験用・大学受験用を選んでから、偏差値帯コースを選択してください");return}if(["short","reading"].includes(mode)&&(!$("examType").value||!$("band").value)){alert("高校受験・大学受験のどちらかを選び、偏差値帯も選択してください");return}if(mode==="grammar"&&!$("difficulty").value){alert("文法の難易度を選んでください");return}if(mode==="writing"&&!$("writingType").value){alert("高校受験・大学受験・英検から選択してください");return}if(mode==="mock"&&!$('mockType').value){alert("埼玉県の高校入試・大学受験用の共通テストから選択してください");return}cfg={examType:$("examType")?.value||"",mockType:$("mockType")?.value||"",band:$("band")?.value||"all",difficulty:$("difficulty")?.value||"standard",score:difficultyScore(mode,$("examType")?.value,$("band")?.value||"all"),writingType:$("writingType")?.value||"",eikenGrade:$("eikenGrade")?.value||"",direction:$("direction")?.value||"mix",vtype:$("vtype")?.value||"choice",topics:[...document.querySelectorAll('input[name=topic]:checked')].map(x=>+x.value)};
 if(mode==="grammar"&&!cfg.topics.length){alert("文法分野を1つ以上選択してください");return}
-let pool=mode==="vocab"?vocab:mode==="grammar"?grammar.filter(q=>cfg.topics.includes(q.topic)&&({basic:q.level<=52,standard:q.level>=50&&q.level<=62,advanced:q.level>=60})[cfg.difficulty]):mode==="short"?short:mode==="reading"?reading:mode==="writing"?(cfg.writingType==="eiken"?eikenWriting.filter(q=>q.grade===cfg.eikenGrade):writing.filter(q=>cfg.writingType==="highschool"?q.level<=60:q.level>=60)):mock.filter(q=>q.examType===cfg.mockType);
+let pool=mode==="vocab"?vocab:mode==="grammar"?grammar.filter(q=>cfg.topics.includes(q.topic)&&({basic:q.level<=52,standard:q.level>=50&&q.level<=62,advanced:q.level>=60})[cfg.difficulty]):mode==="short"?short:mode==="reading"?reading:mode==="writing"?(cfg.writingType==="eiken"?eikenWriting.filter(q=>q.grade===cfg.eikenGrade):cfg.writingType==="highschool"?writingHighschool:writingUniversity):mock.filter(q=>q.examType===cfg.mockType);
 pool=pool.filter(q=>!data.solved[q.id]&&(mode==="mock"||!q.level||(["vocab","short","reading"].includes(mode)?Math.abs(q.level-cfg.score)<=(mode==="vocab"?7:10):mode==="writing"?true:true)));
 if(mode==="short")pool.sort((a,b)=>(data.weak.includes(TOPICS.indexOf(b.focus))?1:0)-(data.weak.includes(TOPICS.indexOf(a.focus))?1:0));
 items=pool.slice(0,({vocab:20,grammar:20,short:3,reading:1,writing:1,mock:10})[mode]);if(!items.length){alert("この条件の未出題問題がありません。偏差値帯や文法分野を変更してください。");return}
@@ -357,6 +357,18 @@ const writing=[
 ,{id:"w07",level:65,prompt:"What can students do to reduce plastic waste in daily life? Give two examples.",words:70}
 ,{id:"w08",level:70,prompt:"Do you think technology makes communication better? Explain your opinion with examples.",words:80}
 
+];
+const writingHighschool=[
+{id:"hsw01",level:45,prompt:"Do you think students should help with housework? Give your opinion and one reason.",words:25},
+{id:"hsw02",level:50,prompt:"What do you like about your school? Explain your answer in English.",words:30},
+{id:"hsw03",level:55,prompt:"Do you think students should join a school club? Give two reasons for your opinion.",words:35},
+{id:"hsw04",level:60,prompt:"Some students study with music, while others prefer silence. Which do you prefer? Give reasons.",words:40}
+];
+const writingUniversity=[
+{id:"unw01",level:60,prompt:"Some people believe that volunteering should be part of university life. Do you agree or disagree? Support your opinion with reasons.",words:70},
+{id:"unw02",level:65,prompt:"Do the advantages of studying abroad outweigh the disadvantages? Explain your position with examples.",words:80},
+{id:"unw03",level:65,prompt:"Some universities offer more online courses than before. Discuss one benefit and one problem of this change.",words:80},
+{id:"unw04",level:70,prompt:"Should universities place greater emphasis on practical skills than on academic knowledge? Develop your argument with examples.",words:100}
 ];
 const eikenWriting=[
 {id:"e3w01",grade:"3",level:45,prompt:"What do you like to do on weekends? Write about it in English.",words:25},
