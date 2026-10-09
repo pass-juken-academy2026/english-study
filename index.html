@@ -57,15 +57,15 @@ if(cfg.vtype==="typed")html+=`<label>答えを入力</label><input id="typed" au
 else if(mode==="grammar"||mode==="mock"){q.liveOptions=shuffle(q.options);html+=`<div class="question">${esc(q.question)}</div>${options(q.liveOptions)}`}
 else if(mode==="reading"){html+=`<div class="question">${esc(q.title)}</div><div class="panel" style="white-space:pre-wrap;background:#f8faff;box-shadow:none">${esc(q.passage)}</div><div class="question">${esc(q.question)}</div>${options(q.options)}`}
 else if(mode==="short")html+=`<div class="question">${esc(q.jp)}</div><p class="muted">英語に訳してください。ポイント：${esc(q.focus)}</p><textarea id="typed" placeholder="英文を入力"></textarea>`;
-else if(mode==="writing")html+=`<div class="question">${esc(q.prompt)}</div><p class="muted">目安：${q.words}語以上</p><textarea id="typed" placeholder="Write your answer here..."></textarea>`;
+else if(mode==="writing")html+=`<div class="question">${esc(q.prompt)}</div><p class="muted">目安：${q.words}語以上</p><div class="panel" style="background:#fff8e8;border-color:#f0d89a;box-shadow:none"><b>採点についての注意</b><p>このサイトでは語数・文数・文頭の大文字などの簡易チェックはできますが、内容が質問に合っているか、文法の正確さ、語彙の適切さ、自然な表現、論理のつながりは正確に自動採点できません。これらの項目は自動採点できないため、模範解答や先生の添削などで確認してください。</p></div><textarea id="typed" placeholder="Write your answer here..."></textarea>`;
 html+=`<div class="actions"><button onclick="answer()">回答する</button></div>`;$("quizBody").innerHTML=html}
 function options(arr){return `<div class="options">${arr.map(o=>`<label class="option"><input type="radio" name="ans" value="${esc(o)}"><span>${esc(o)}</span></label>`).join("")}</div>`}
 function norm(s){return String(s).trim().toLowerCase().replace(/[.!?。、「」]/g,"").replace(/\s+/g," ")}
 function answer(){let q=qNow,raw="",correct=false,answer="",feedback="",topic=q.topic;
 if(mode==="vocab"){raw=cfg.vtype==="typed"?$("typed").value.trim():document.querySelector('input[name=ans]:checked')?.value||"";if(!raw){alert("答えを選ぶか入力してください");return}answer=q.liveAnswer;correct=norm(raw)===norm(answer);feedback=correct?"正解！":"正解："+answer}
 else if(["grammar","mock","reading"].includes(mode)){raw=document.querySelector('input[name=ans]:checked')?.value||"";if(!raw){alert("選択肢を選んでください");return}answer=q.answer;correct=raw===answer;feedback=(correct?"正解！":"正解："+answer)+(q.explain?"\\n"+q.explain:"")}
-else if(mode==="short"){raw=$("typed").value.trim();if(!raw){alert("英文を入力してください");return}answer=q.answer;correct=norm(raw)===norm(answer);feedback=(correct?"解答例と一致しました。":"解答例："+answer)+"\\n※意味が同じ別解もあります。"}
-else {raw=$("typed").value.trim();if(!raw){alert("英文を入力してください");return}let words=raw.match(/[A-Za-z]+(?:'[A-Za-z]+)?/g)||[],sentences=raw.split(/[.!?]+/).filter(x=>x.trim()).length;answer="簡易チェック";correct=words.length>=q.words;feedback=`語数：約${words.length}語（目安${q.words}語）\\n文の数：約${sentences}文\\n文頭の大文字：${/^[A-Z]/.test(raw)?"OK":"要確認"}\\n文末の句読点：/[.!?]で終わるか確認\\n内容・文法・自然さは完全自動採点できません。`}
+else if(mode==="short"){raw=$("typed").value.trim();if(!raw){alert("英文を入力してください");return}answer=q.answer;correct=norm(raw)===norm(answer);feedback=(correct?"入力は模範解答と一致しました。":"入力と模範解答を比べて確認しましょう。")+"\\n模範解答："+answer+"\\nポイント："+(q.focus||"語順・文法")+"\\n※意味が同じ別解もあります。"}
+else {raw=$("typed").value.trim();if(!raw){alert("英文を入力してください");return}let words=raw.match(/[A-Za-z]+(?:'[A-Za-z]+)?/g)||[],sentences=raw.split(/[.!?]+/).filter(x=>x.trim()).length;answer="簡易チェック";correct=words.length>=q.words;feedback=`語数：約${words.length}語（目安${q.words}語）\\n文の数：約${sentences}文\\n文頭の大文字：${/^[A-Z]/.test(raw)?"OK":"要確認"}\\n文末の句読点：/[.!?]で終わるか確認\\n内容の適切さ・文法・語彙・自然さ・論理のつながりは正確に自動採点できません。これらは自動採点できないため、模範解答や先生の添削で確認してください。`}
 data.solved[q.id]={mode,correct,at:Date.now(),response:raw};data.attempts.push({id:q.id,mode,topic,category:categoryFor(mode,q),correct});if(mode==="grammar"&&topic!==undefined){let st=data.topicStats[topic]||(data.topicStats[topic]={total:0,correct:0});st.total++;if(correct)st.correct++}save();answers.push({q,raw,correct,answer,feedback,topic});
 $("quizBody").innerHTML=`<div class="feedback ${correct?"good":"bad"}"><b>${correct?"正解":"確認しよう"}</b>\\n${esc(feedback)}</div><div class="actions"><button onclick="next()">次へ</button></div>`}
 function next(){idx++;render()}
@@ -196,6 +196,34 @@ stats();
 
 const vocab=[
 {id:"v01",jp:"決定する",en:"decide",distractors:["describe","deliver","discover"],level:45},{id:"v02",jp:"環境",en:"environment",distractors:["equipment","experience","government"],level:55},{id:"v03",jp:"増加する",en:"increase",distractors:["include","improve","invent"],level:50},{id:"v04",jp:"避ける",en:"avoid",distractors:["allow","appear","afford"],level:55},{id:"v05",jp:"機会",en:"opportunity",distractors:["opinion","operation","opposite"],level:60},{id:"v06",jp:"必要な",en:"necessary",distractors:["ordinary","natural","nervous"],level:50},{id:"v07",jp:"影響",en:"effect",distractors:["effort","event","fact"],level:50},{id:"v08",jp:"提案する",en:"suggest",distractors:["support","suppose","succeed"],level:55},{id:"v09",jp:"証拠",en:"evidence",distractors:["advantage","education","attention"],level:60},{id:"v10",jp:"地域社会",en:"community",distractors:["company","competition","communication"],level:55},{id:"v11",jp:"可能性",en:"possibility",distractors:["personality","popularity","permission"],level:60},{id:"v12",jp:"責任",en:"responsibility",distractors:["relationship","reputation","reality"],level:60},{id:"v13",jp:"比較する",en:"compare",distractors:["complete","contain","consider"],level:50},{id:"v14",jp:"達成する",en:"achieve",distractors:["admit","adopt","announce"],level:60},{id:"v15",jp:"特に",en:"particularly",distractors:["probably","properly","previously"],level:65},{id:"v16",jp:"利用可能な",en:"available",distractors:["valuable","comfortable","reasonable"],level:55},{id:"v17",jp:"態度",en:"attitude",distractors:["altitude","aptitude","activity"],level:60},{id:"v18",jp:"利益、恩恵",en:"benefit",distractors:["behavior","belief","border"],level:50},{id:"v19",jp:"証明する",en:"prove",distractors:["provide","prevent","prefer"],level:55},{id:"v20",jp:"適切な",en:"appropriate",distractors:["accurate","average","anxious"],level:65},{id:"v21",jp:"発展、開発",en:"development",distractors:["department","document","description"],level:55},{id:"v22",jp:"参加する",en:"participate",distractors:["predict","persuade","perform"],level:60},{id:"v23",jp:"認識する",en:"recognize",distractors:["recommend","represent","recover"],level:60},{id:"v24",jp:"状況",en:"circumstance",distractors:["consequence","confidence","convenience"],level:65},{id:"v25",jp:"複雑な",en:"complex",distractors:["complete","common","convenient"],level:55},{id:"v26",jp:"主張する",en:"claim",distractors:["blame","climb","calm"],level:60},{id:"v27",jp:"維持する",en:"maintain",distractors:["mention","manage","measure"],level:60},{id:"v28",jp:"消費する",en:"consume",distractors:["concern","confirm","connect"],level:60},{id:"v29",jp:"現象",en:"phenomenon",distractors:["philosophy","photograph","permission"],level:70},{id:"v30",jp:"避けられない",en:"inevitable",distractors:["incredible","independent","invisible"],level:70},{id:"v31",jp:"よく考える",en:"consider",distractors:["achieve","recognize","suggest"],level:55},{id:"v32",jp:"結果",en:"consequence",distractors:["environment","opportunity","responsibility"],level:60},{id:"v33",jp:"設立する、確立する",en:"establish",distractors:["avoid","maintain","compare"],level:60},{id:"v34",jp:"示す",en:"indicate",distractors:["participate","consume","decide"],level:60},{id:"v35",jp:"重要な、かなりの",en:"significant",distractors:["complex","appropriate","available"],level:65}
+,{id:"v36",jp:"達成、成果",en:"achievement",distractors:["agreement","argument","arrangement"],level:55}
+,{id:"v37",jp:"環境に優しい",en:"environmentally friendly",distractors:["personally important","economically active","politically useful"],level:60}
+,{id:"v38",jp:"調査する",en:"investigate",distractors:["interrupt","introduce","imagine"],level:60}
+,{id:"v39",jp:"資源",en:"resource",distractors:["research","response","reason"],level:55}
+,{id:"v40",jp:"伝統",en:"tradition",distractors:["translation","transportation","treatment"],level:50}
+,{id:"v41",jp:"影響を与える",en:"affect",distractors:["accept","except","expect"],level:55}
+,{id:"v42",jp:"選択",en:"choice",distractors:["chance","charge","change"],level:45}
+,{id:"v43",jp:"利益、利点",en:"advantage",distractors:["advertisement","adventure","achievement"],level:55}
+,{id:"v44",jp:"欠点",en:"disadvantage",distractors:["disagreement","discovery","disappointment"],level:60}
+,{id:"v45",jp:"解決する",en:"solve",distractors:["serve","seem","share"],level:45}
+,{id:"v46",jp:"解決策",en:"solution",distractors:["selection","suggestion","situation"],level:55}
+,{id:"v47",jp:"人口",en:"population",distractors:["pollution","position","production"],level:55}
+,{id:"v48",jp:"汚染",en:"pollution",distractors:["population","permission","prediction"],level:55}
+,{id:"v49",jp:"絶滅した",en:"extinct",distractors:["exact","excellent","expensive"],level:65}
+,{id:"v50",jp:"保護する",en:"protect",distractors:["produce","pretend","provide"],level:50}
+,{id:"v51",jp:"共有する",en:"share",distractors:["solve","search","separate"],level:45}
+,{id:"v52",jp:"経験",en:"experience",distractors:["experiment","expression","expectation"],level:50}
+,{id:"v53",jp:"行動",en:"behavior",distractors:["benefit","belief","border"],level:55}
+,{id:"v54",jp:"発明する",en:"invent",distractors:["invite","invest","involve"],level:55}
+,{id:"v55",jp:"発明",en:"invention",distractors:["invitation","investment","involvement"],level:60}
+,{id:"v56",jp:"主に",en:"mainly",distractors:["nearly","merely","rarely"],level:55}
+,{id:"v57",jp:"めったに〜ない",en:"rarely",distractors:["recently","really","roughly"],level:60}
+,{id:"v58",jp:"それにもかかわらず",en:"nevertheless",distractors:["therefore","otherwise","moreover"],level:70}
+,{id:"v59",jp:"その結果",en:"as a result",distractors:["for example","in advance","at first"],level:60}
+,{id:"v60",jp:"個人の",en:"individual",distractors:["industrial","international","informal"],level:65}
+
+];
+const grammar=
 ];
 const grammar=[
 {id:"g01",topic:0,level:45,question:"I ___ to school by bus every day.",options:["go","am going","went","have gone"],answer:"go",explain:"every day は習慣なので現在形。"},
@@ -270,16 +298,55 @@ const short=[
 {id:"s08",level:65,jp:"彼がどこに住んでいるか知っていますか。",answer:"Do you know where he lives?",focus:"間接疑問文"},
 {id:"s09",level:65,jp:"この問題は私が思っていたより難しいです。",answer:"This problem is more difficult than I thought.",focus:"比較"},
 {id:"s10",level:70,jp:"彼女は私にその本を読むように勧めました。",answer:"She advised me to read the book.",focus:"動詞の語法・不定詞"}
+,{id:"s11",level:45,jp:"私は週末に祖母を訪ねます。",answer:"I visit my grandmother on weekends.",focus:"現在形・前置詞"}
+,{id:"s12",level:50,jp:"彼は今、宿題をしています。",answer:"He is doing his homework now.",focus:"現在進行形"}
+,{id:"s13",level:50,jp:"私たちは昨日、公園でサッカーをしました。",answer:"We played soccer in the park yesterday.",focus:"過去形・前置詞"}
+,{id:"s14",level:55,jp:"私は今までに京都を訪れたことがあります。",answer:"I have visited Kyoto before.",focus:"現在完了"}
+,{id:"s15",level:55,jp:"あなたはここで写真を撮ってもいいです。",answer:"You may take pictures here.",focus:"助動詞"}
+,{id:"s16",level:55,jp:"私は彼がどこに住んでいるか知りません。",answer:"I don't know where he lives.",focus:"間接疑問文"}
+,{id:"s17",level:60,jp:"雨が降っていたけれど、私たちは散歩に出かけました。",answer:"Although it was raining, we went for a walk.",focus:"接続詞"}
+,{id:"s18",level:60,jp:"英語を学ぶことは私にとって大切です。",answer:"Learning English is important to me.",focus:"動名詞"}
+,{id:"s19",level:60,jp:"彼は私より早く走れます。",answer:"He can run faster than I can.",focus:"比較・助動詞"}
+,{id:"s20",level:60,jp:"これは私が今まで読んだ中で最も面白い本です。",answer:"This is the most interesting book I have ever read.",focus:"最上級・現在完了"}
+,{id:"s21",level:55,jp:"窓を開けてもらえますか。",answer:"Could you open the window?",focus:"依頼の表現"}
+,{id:"s22",level:55,jp:"彼女は医者になるために一生懸命勉強しています。",answer:"She is studying hard to become a doctor.",focus:"不定詞・進行形"}
+,{id:"s23",level:60,jp:"私は忙しすぎてあなたを手伝えません。",answer:"I am too busy to help you.",focus:"too ... to"}
+,{id:"s24",level:60,jp:"彼は疲れていたので、早く寝ました。",answer:"He went to bed early because he was tired.",focus:"接続詞・過去形"}
+,{id:"s25",level:60,jp:"私が駅に着いたとき、電車はすでに出発していました。",answer:"When I arrived at the station, the train had already left.",focus:"過去完了"}
+,{id:"s26",level:65,jp:"私にとって毎日英語を練習することは役に立ちます。",answer:"It is useful for me to practice English every day.",focus:"形式主語 it"}
+,{id:"s27",level:65,jp:"もし明日晴れたら、私たちは海へ行きます。",answer:"If it is sunny tomorrow, we will go to the beach.",focus:"条件文"}
+,{id:"s28",level:65,jp:"彼女は私にその問題を説明してくれました。",answer:"She explained the problem to me.",focus:"動詞の語法"}
+,{id:"s29",level:65,jp:"私は彼が約束を守ると信じています。",answer:"I believe that he will keep his promise.",focus:"接続詞 that"}
+,{id:"s30",level:70,jp:"もっと早く出発していれば、私たちはバスに間に合ったのに。",answer:"If we had left earlier, we would have caught the bus.",focus:"過去の仮定法"}
+
+];
+const reading=
 ];
 const reading=[
 {id:"r01",level:50,title:"Reading: A Small Change",passage:"Mika used to buy a bottle of water every day on her way to school. One day, her teacher talked about plastic waste. Mika decided to carry a reusable bottle instead. At first, she sometimes forgot it, so she put it next to her school bag every night. After a month, the habit became easy. Mika learned that a small action can become meaningful when people continue it.",question:"Why did Mika put her bottle next to her school bag at night?",options:["To remember to take it to school","To keep it cold until morning","To show it to her teacher","To avoid drinking water at school"],answer:"To remember to take it to school",explain:"最初は忘れることがあったため、夜にバッグの横へ置いた。"},
 {id:"r02",level:60,title:"Reading: Learning Together",passage:"When a group of students began a science project, they disagreed about how to present their results. Some wanted a poster, while others preferred a short video. Instead of voting immediately, they listed the advantages of both ideas. They finally made a video and used a small poster to explain the main points. The project taught them that listening carefully can lead to a solution that no one had considered at first.",question:"What did the students do before choosing how to present their project?",options:["They listed the advantages of both ideas","They asked another class to do the project","They stopped working on the project","They chose the first idea without discussion"],answer:"They listed the advantages of both ideas",explain:"すぐに投票せず、両方の案の利点を整理した。"},
 {id:"r03",level:65,title:"Reading: Public Libraries Today",passage:"Some people believe that public libraries are less important because so much information is available online. However, libraries offer more than books. They provide quiet places to study, free access to computers, and programs where people can learn new skills. For students who do not have a suitable place to work at home, these services can be especially valuable. Libraries are changing, but their role in supporting learning remains important.",question:"Why can libraries be especially valuable for some students?",options:["They provide a suitable place to study","They guarantee higher test scores","They replace every online resource","They require students to buy books"],answer:"They provide a suitable place to study",explain:"家に適した学習場所がない生徒にとって役立つ。"}
+,{id:"r04",level:50,title:"Reading: A School Garden",passage:"Last spring, students at Green Hill School started a small garden behind their science building. They planted tomatoes and beans and took turns watering them. At first, some plants grew slowly because the soil was too dry. The students learned to check the soil before watering. By summer, they had enough vegetables to share with the school kitchen.",question:"What did the students learn to do before watering the plants?",options:["Check whether the soil was dry","Add more seeds every day","Move the garden indoors","Harvest vegetables in spring"],answer:"Check whether the soil was dry",explain:"土が乾いているか確認してから水をやることを学んだ。"}
+,{id:"r05",level:55,title:"Reading: A Helpful App",passage:"Rina often forgot the books she needed for class. She began using a simple phone app to make a list of school materials for each day. Every evening, she checked the list while packing her bag. After two weeks, she noticed that she was forgetting fewer things. She also shared the idea with a friend who had the same problem.",question:"When did Rina check the list?",options:["Every evening while packing her bag","Only after reaching school","During every class","Once at the end of the month"],answer:"Every evening while packing her bag",explain:"毎晩、かばんを準備しながらリストを確認した。"}
+,{id:"r06",level:60,title:"Reading: City Buses",passage:"A town introduced a bus service that connected the train station with several neighborhoods. At first, few people used it because they did not know the schedule. The town then put clear timetables at bus stops and posted the information online. More residents began using the service, especially on rainy days when walking was difficult.",question:"Why did more residents begin using the bus service?",options:["The town made schedule information easier to find","The bus became free for everyone","The service stopped at fewer places","Residents no longer needed to travel"],answer:"The town made schedule information easier to find",explain:"時刻表を確認しやすくしたため。"}
+,{id:"r07",level:65,title:"Reading: Learning from Mistakes",passage:"When Daniel first joined a debate club, he tried to memorize every sentence before speaking. If he forgot a word, he became nervous and stopped. His coach suggested that he remember three main points instead of a complete script. Daniel practiced explaining those points in different ways. Over time, he became more comfortable answering unexpected questions.",question:"What advice did Daniel's coach give him?",options:["Remember three main points rather than every sentence","Avoid answering questions from others","Speak only after memorizing a full script","Stop practicing with different explanations"],answer:"Remember three main points rather than every sentence",explain:"全文ではなく3つの要点を覚えるよう助言した。"}
+,{id:"r08",level:70,title:"Reading: Repair Instead of Replace",passage:"In one neighborhood, volunteers began holding monthly repair events. People brought broken lamps, torn bags, and small appliances. Volunteers helped visitors fix what they could and explained how the items worked. The events did not solve every problem, but they helped some residents save money and reduced the amount of waste sent away.",question:"Which result of the repair events is mentioned?",options:["Some residents saved money and less waste was discarded","Every item was repaired successfully","Residents stopped buying household goods","Volunteers replaced all items for free"],answer:"Some residents saved money and less waste was discarded",explain:"節約につながり、廃棄物も減らした。"}
+
+];
+const writing=
 ];
 const writing=[
 {id:"w01",level:50,prompt:"Do you think high school students should have a part-time job? Give your opinion and two reasons.",words:50},
 {id:"w02",level:60,prompt:"Some people prefer studying alone, while others prefer studying with friends. Which do you prefer, and why?",words:60},
 {id:"w03",level:65,prompt:"What is one change that would make your town a better place for young people? Explain your idea.",words:70}
+,{id:"w04",level:55,prompt:"Do you think students should read books every day? Give your opinion and two reasons.",words:50}
+,{id:"w05",level:60,prompt:"Describe one skill you would like to learn and explain why it is useful.",words:60}
+,{id:"w06",level:65,prompt:"Some people think school uniforms are necessary. Do you agree or disagree? Give two reasons.",words:70}
+,{id:"w07",level:65,prompt:"What can students do to reduce plastic waste in daily life? Give two examples.",words:70}
+,{id:"w08",level:70,prompt:"Do you think technology makes communication better? Explain your opinion with examples.",words:80}
+
+];
+const mock=
 ];
 const mock=[
 {id:"m01",examType:"saitama",level:45,question:"She usually ___ breakfast at seven.",options:["has","have","is have","having"],answer:"has",explain:"She は三人称単数なので has。"},
@@ -292,5 +359,18 @@ const mock=[
 {id:"m08",examType:"common",level:65,question:"A number of students ___ absent today.",options:["is","are","was","has"],answer:"are",explain:"a number of + 複数名詞は複数扱い。"},
 {id:"m09",examType:"common",level:55,title:"Mini Reading",passage:"Ken wanted to improve his English listening. He listened to a short podcast on the train each morning. At first, he understood very little. Instead of giving up, he listened to the same episode several times and wrote down useful expressions. After a few weeks, he noticed that familiar phrases were easier to recognize.",question:"What helped Ken continue learning?",options:["Listening to the same episode repeatedly","Changing podcasts every minute","Avoiding unfamiliar expressions","Studying only on weekends"],answer:"Listening to the same episode repeatedly",explain:"同じエピソードを何度も聞いた。"},
 {id:"m10",examType:"common",level:65,question:"The instructions were explained ___, so everyone understood them.",options:["clear","clearly","clearness","clearing"],answer:"clearly",explain:"explained を修飾する副詞。"}
+,{id:"m11",examType:"saitama",level:50,question:"My brother enjoys ___ books about history.",options:["read","to read","reading","reads"],answer:"reading",explain:"enjoy の後ろは動名詞。"}
+,{id:"m12",examType:"saitama",level:55,question:"The girl ___ is talking to Mr. Sato is my cousin.",options:["which","who","where","whose"],answer:"who",explain:"人を先行詞とし、主語の役割をする関係代名詞 who。"}
+,{id:"m13",examType:"saitama",level:55,question:"We have lived in this town ___ 2020.",options:["for","since","during","while"],answer:"since",explain:"開始時点の前は since。"}
+,{id:"m14",examType:"saitama",level:60,question:"I was so tired that I could ___ keep my eyes open.",options:["hard","hardly","almost","near"],answer:"hardly",explain:"hardly は「ほとんど〜ない」。"}
+,{id:"m15",examType:"saitama",level:60,question:"Could you tell me ___ the nearest station is?",options:["where","what","which one","where is"],answer:"where",explain:"間接疑問文は where + 主語 + 動詞の語順。"}
+,{id:"m16",examType:"common",level:65,question:"Despite ___ very little time, the team finished the project.",options:["have","having","had","to have"],answer:"having",explain:"despite は前置詞なので後ろは名詞・動名詞。"}
+,{id:"m17",examType:"common",level:65,question:"The new policy is expected ___ the number of plastic bags used.",options:["reduce","reducing","to reduce","reduced"],answer:"to reduce",explain:"be expected to do の形。"}
+,{id:"m18",examType:"common",level:70,question:"Not only ___ the deadline, but she also improved the final report.",options:["she met","did she meet","she did met","met she"],answer:"did she meet",explain:"Not only が文頭に来ると主節は倒置する。"}
+,{id:"m19",examType:"common",level:65,question:"The results were different from ___ we had expected.",options:["that","what","which one","who"],answer:"what",explain:"what は節の中で目的語になる。"}
+,{id:"m20",examType:"common",level:70,question:"Had I known about the traffic, I ___ an earlier train.",options:["take","will take","would have taken","had taken"],answer:"would have taken",explain:"Had I known は If I had known の倒置形。"}
+
+];
+</script></body></html>
 ];
 </script></body></html>
