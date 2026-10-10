@@ -754,17 +754,25 @@ document.getElementById("englishKnowledgeSearchButton").addEventListener("click"
  const meta=document.getElementById('sws-meta');
  const results=document.getElementById('sws-results');
  if(!panel||!input||!reset||!meta||!results)return;
- const selector='article,.entry,.question,.formula,.formula-item,.term,.word-card,.knowledge-item,.concept,.event,.timeline-item,.history-card,.topic-card,.knowledge-card,.term-card,.result-item,tr,li';
+ const selector='article,.entry,.question,.formula,.formula-card,.formula-item,.term,.word-card,.knowledge-item,.concept,.event,.timeline-item,.history-card,.topic-card,.topic,.topiclist,.knowledge-card,.term-card,.result-item,.resultrow,.data-result,.item,.unit,.card,.menu-card,tr,li';
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  let matches=[];
+ function textOf(el){return (el.innerText||el.textContent||'').replace(/\s+/g,' ').trim()}
  function indexItems(){
-   return Array.from(document.querySelectorAll(selector)).filter(el=>{
-     if(panel.contains(el))return false;
-     if(el.closest('#subject-wide-search'))return false;
-     if(el.parentElement&&el.parentElement.closest(selector))return false;
-     const text=(el.innerText||el.textContent||'').replace(/\s+/g,' ').trim();
-     return text.length>=8&&text.length<=1800;
-   }).map((el,i)=>({el,text:(el.innerText||el.textContent||'').replace(/\s+/g,' ').trim(),i}));
+   const nodes=Array.from(document.querySelectorAll(selector)).filter(el=>!panel.contains(el));
+   return nodes.filter(el=>{
+     const text=textOf(el);
+     if(text.length<8||text.length>1800)return false;
+     let parent=el.parentElement;
+     while(parent&&!panel.contains(parent)){
+       if(parent.matches&&parent.matches(selector)){
+         const parentText=textOf(parent);
+         if(parentText.length>=8&&parentText.length<=1800)return false;
+       }
+       parent=parent.parentElement;
+     }
+     return true;
+   }).map((el,i)=>({el,text:textOf(el),i}));
  }
  function render(){
    const q=input.value.trim().toLocaleLowerCase();
