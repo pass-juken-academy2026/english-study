@@ -754,20 +754,25 @@ document.getElementById("englishKnowledgeSearchButton").addEventListener("click"
  const meta=document.getElementById('sws-meta');
  const results=document.getElementById('sws-results');
  if(!panel||!input||!reset||!meta||!results)return;
- const selector='article,.entry,.question,.formula,.formula-card,.formula-item,.term,.word-card,.knowledge-item,.concept,.event,.timeline-item,.history-card,.topic-card,.topic,.topiclist,.knowledge-card,.term-card,.result-item,.resultrow,.data-result,.item,.unit,.card,.menu-card,tr,li';
+ const selector='article,.entry,.question,.question-card,.formula,.formula-card,.formula-item,.term,.term-card,.word-card,.vocab-item,.vocabulary-item,.knowledge-item,.knowledge-card,.concept,.definition,.event,.timeline-item,.history-card,.topic-card,.topic,.topiclist,.entry-list,.knowledge-list,.lesson-item,.quiz-item,.practice-item,.result-item,.resultrow,.data-result,.item,.unit,.card,.menu-card,.subject,.work,.menu,.row,.tag,dt,dd,h2,h3,h4,tr,li';
  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const textOf=el=>(el.innerText||el.textContent||'').replace(/\s+/g,' ').trim();
  let matches=[];
- function textOf(el){return (el.innerText||el.textContent||'').replace(/\s+/g,' ').trim()}
  function indexItems(){
-   const nodes=Array.from(document.querySelectorAll(selector)).filter(el=>!panel.contains(el));
-   return nodes.filter(el=>{
+   const nodes=Array.from(document.querySelectorAll(selector)).filter(el=>{
+     if(panel.contains(el))return false;
+     if(typeof el.getClientRects==='function'&&el.getClientRects().length===0)return false;
      const text=textOf(el);
-     if(text.length<8||text.length>1800)return false;
+     return text.length>=8&&text.length<=1800;
+   });
+   return nodes.filter(el=>{
      let parent=el.parentElement;
      while(parent&&!panel.contains(parent)){
        if(parent.matches&&parent.matches(selector)){
-         const parentText=textOf(parent);
-         if(parentText.length>=8&&parentText.length<=1800)return false;
+         if(typeof parent.getClientRects!=='function'||parent.getClientRects().length>0){
+           const parentText=textOf(parent);
+           if(parentText.length>=8&&parentText.length<=1800)return false;
+         }
        }
        parent=parent.parentElement;
      }
@@ -778,16 +783,16 @@ document.getElementById("englishKnowledgeSearchButton").addEventListener("click"
    const q=input.value.trim().toLocaleLowerCase();
    results.innerHTML='';
    matches=[];
-   if(!q){meta.textContent='検索語を入力すると、このページに表示されている学習項目を検索します。';return;}
+   if(!q){meta.textContent='検索語を入力すると、現在表示されている学習項目を検索します。';return;}
    const terms=q.split(/\s+/).filter(Boolean);
-   matches=indexItems().filter(item=>terms.every(t=>item.text.toLocaleLowerCase().includes(t))).slice(0,80);
-   meta.textContent=matches.length+'件表示'+(matches.length===80?'（最大80件）':'')+'。元の単元・問題機能はそのまま使えます。';
+   matches=indexItems().filter(item=>terms.every(term=>item.text.toLocaleLowerCase().includes(term))).slice(0,80);
+   meta.textContent=matches.length+'件表示'+(matches.length===80?'（最大80件）':'')+'。結果を選ぶと該当箇所へ移動します。';
    if(!matches.length){results.innerHTML='<p>該当する項目がありません。別の語句で検索するか、リセットしてください。</p>';return;}
    results.innerHTML=matches.map((item,i)=>{
-     const title=(item.el.querySelector('h1,h2,h3,h4,strong,b,.title,.name')||item.el).innerText||item.text;
-     const clean=title.replace(/\s+/g,' ').trim();
+     const heading=item.el.querySelector('h1,h2,h3,h4,strong,b,.title,.name');
+     const title=(heading?textOf(heading):item.text);
      const snippet=item.text.length>230?item.text.slice(0,230)+'…':item.text;
-     return '<button type="button" class="sws-result" data-sws-index="'+i+'"><strong>'+esc(clean.slice(0,100))+'</strong><span>'+esc(snippet)+'</span></button>';
+     return '<button type="button" class="sws-result" data-sws-index="'+i+'"><strong>'+esc(title.slice(0,100))+'</strong><span>'+esc(snippet)+'</span></button>';
    }).join('');
  }
  input.addEventListener('input',render);
@@ -798,10 +803,11 @@ document.getElementById("englishKnowledgeSearchButton").addEventListener("click"
    const item=matches[Number(button.dataset.swsIndex)];
    if(!item)return;
    item.el.scrollIntoView({behavior:'smooth',block:'center'});
-   const old=item.el.style.outline;
+   const oldOutline=item.el.style.outline;
+   const oldOffset=item.el.style.outlineOffset;
    item.el.style.outline='3px solid #65c9f1';
    item.el.style.outlineOffset='4px';
-   setTimeout(()=>{item.el.style.outline=old;item.el.style.outlineOffset='';},1600);
+   setTimeout(()=>{item.el.style.outline=oldOutline;item.el.style.outlineOffset=oldOffset;},1600);
  });
 })();
 </script></body></html>
