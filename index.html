@@ -25,7 +25,21 @@ button{min-height:42px}
   pre,code{overflow-wrap:anywhere;white-space:pre-wrap}
   input,select,textarea{font-size:16px}
 }
-</style></head><body>
+</style><style id="subject-wide-search-style">
+#subject-wide-search{position:sticky;top:0;z-index:9998;padding:10px 14px;background:rgba(7,20,38,.97);border-bottom:1px solid #355575;color:#edf5ff;box-shadow:0 4px 14px #0003}
+#subject-wide-search .sws-inner{max-width:1080px;margin:auto}
+#subject-wide-search summary{cursor:pointer;font-weight:750;padding:3px 0}
+#subject-wide-search .sws-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+#subject-wide-search input{flex:1;min-width:180px;width:100%;font:inherit;padding:10px 12px;border:1px solid #5581a5;border-radius:9px;background:#091a2e;color:#f3f8ff}
+#subject-wide-search button{font:inherit;min-height:42px;padding:8px 13px;border:1px solid #438bb0;border-radius:9px;background:#17658b;color:#fff;cursor:pointer}
+#subject-wide-search .sws-meta{margin:7px 0;color:#c3d5e9;font-size:.9rem}
+#subject-wide-search .sws-results{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr));gap:8px;max-height:38vh;overflow:auto}
+#subject-wide-search .sws-result{display:block;width:100%;text-align:left;white-space:normal;background:#10233d;border:1px solid #355575;border-radius:9px;padding:10px;color:#edf5ff}
+#subject-wide-search .sws-result strong{display:block;margin-bottom:3px}
+#subject-wide-search .sws-result span{display:block;color:#c3d5e9;font-size:.88rem;font-weight:400}
+#subject-wide-search [hidden]{display:none!important}
+@media(max-width:600px){#subject-wide-search{padding:8px 10px}#subject-wide-search .sws-controls{align-items:stretch}#subject-wide-search input{min-width:0;flex-basis:100%;font-size:16px}#subject-wide-search .sws-results{max-height:32vh}}
+</style></head><body><section id="subject-wide-search" aria-label="科目内横断検索"><div class="sws-inner"><details><summary>🔎 ページ内を横断検索（単元・用語・解説・問題）</summary><div class="sws-controls"><input id="sws-query" type="search" placeholder="例：重要語句・公式・人物名・単元名" autocomplete="off" aria-label="ページ内検索語"><button id="sws-reset" type="button">リセット</button></div><p id="sws-meta" class="sws-meta" aria-live="polite">検索語を入力すると、このページに表示されている学習項目を検索します。</p><div id="sws-results" class="sws-results"></div></details></div></section>
 <header><div><h1>
         <span class="line">英語受験対策</span>
       </h1><p>単語・文法・短文・長文・英作文・模擬テスト</p><section class="panel" style="margin-top:14px;text-align:left"><label for="englishKnowledgeSearch"><strong>英単語・文法・関連語を検索</strong></label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><input id="englishKnowledgeSearch" type="search" placeholder="例：環境、environment、現在完了" style="flex:1;min-width:0"><button type="button" id="englishKnowledgeSearchButton">検索</button></div><div id="englishKnowledgeSearchResults" aria-live="polite"></div></section></div></header>
@@ -732,4 +746,62 @@ const ENGLISH_ALIASES={"三単現":"三人称単数 現在形 third person singu
 function searchEnglishKnowledge(){const q=normEnglishSearch(document.getElementById("englishKnowledgeSearch").value),out=document.getElementById("englishKnowledgeSearchResults");out.replaceChildren();if(!q){out.textContent="検索語を入力してください。";return}const expanded=Object.entries(ENGLISH_ALIASES).filter(([key])=>normEnglishSearch(key).includes(q)||q.includes(normEnglishSearch(key))).map(([,value])=>normEnglishSearch(value));const sets=[["英単語",vocab],["文法",grammar],["短文",short],["長文",reading],["英作文",writing],["高校英作文",writingHighschool],["大学英作文",writingUniversity],["熟語",EXTRA_IDIOMS],["文法パターン",grammarPatterns]];const hits=[];sets.forEach(([category,items])=>(items||[]).forEach((item,i)=>{const text=normEnglishSearch(JSON.stringify(item));if(text.includes(q)||expanded.some(term=>term.split(" ").some(word=>word.length>2&&text.includes(normEnglishSearch(word))))){const o=item&&typeof item==="object"?item:{};const title=o.jp||o.en||o.word||o.title||o.topic||o.front||o.q||o.prompt||category+" "+(i+1);const detail=[o.en,o.jp,o.meaning,o.definition,o.explanation,o.example,o.back,o.translation].filter(Boolean).join(" / ")||JSON.stringify(item).slice(0,220);hits.push({category,title,detail})}}));if(!hits.length){out.textContent="見つかりませんでした。日本語訳・英語表記・関連する文法語でも検索してください。";return}const count=document.createElement("p");count.className="muted";count.textContent=hits.length+"件";out.appendChild(count);hits.slice(0,40).forEach(h=>{const card=document.createElement("article");card.className="card";card.style.margin="8px 0";const title=document.createElement("strong");title.textContent=h.title;const tag=document.createElement("span");tag.className="tag";tag.textContent=h.category;const detail=document.createElement("p");detail.textContent=h.detail;card.append(title," ",tag,detail);out.appendChild(card)})}
 document.getElementById("englishKnowledgeSearchButton").addEventListener("click",searchEnglishKnowledge);document.getElementById("englishKnowledgeSearch").addEventListener("input",searchEnglishKnowledge);
 </script>
-</body></html>
+<script id="subject-wide-search-script">
+(()=> {
+ const panel=document.getElementById('subject-wide-search');
+ const input=document.getElementById('sws-query');
+ const reset=document.getElementById('sws-reset');
+ const meta=document.getElementById('sws-meta');
+ const results=document.getElementById('sws-results');
+ if(!panel||!input||!reset||!meta||!results)return;
+ const selector='article,.entry,.question,.formula,.formula-card,.formula-item,.term,.word-card,.knowledge-item,.concept,.event,.timeline-item,.history-card,.topic-card,.topic,.topiclist,.knowledge-card,.term-card,.result-item,.resultrow,.data-result,.item,.unit,.card,.menu-card,tr,li';
+ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ let matches=[];
+ function textOf(el){return (el.innerText||el.textContent||'').replace(/\s+/g,' ').trim()}
+ function indexItems(){
+   const nodes=Array.from(document.querySelectorAll(selector)).filter(el=>!panel.contains(el));
+   return nodes.filter(el=>{
+     const text=textOf(el);
+     if(text.length<8||text.length>1800)return false;
+     let parent=el.parentElement;
+     while(parent&&!panel.contains(parent)){
+       if(parent.matches&&parent.matches(selector)){
+         const parentText=textOf(parent);
+         if(parentText.length>=8&&parentText.length<=1800)return false;
+       }
+       parent=parent.parentElement;
+     }
+     return true;
+   }).map((el,i)=>({el,text:textOf(el),i}));
+ }
+ function render(){
+   const q=input.value.trim().toLocaleLowerCase();
+   results.innerHTML='';
+   matches=[];
+   if(!q){meta.textContent='検索語を入力すると、このページに表示されている学習項目を検索します。';return;}
+   const terms=q.split(/\s+/).filter(Boolean);
+   matches=indexItems().filter(item=>terms.every(t=>item.text.toLocaleLowerCase().includes(t))).slice(0,80);
+   meta.textContent=matches.length+'件表示'+(matches.length===80?'（最大80件）':'')+'。元の単元・問題機能はそのまま使えます。';
+   if(!matches.length){results.innerHTML='<p>該当する項目がありません。別の語句で検索するか、リセットしてください。</p>';return;}
+   results.innerHTML=matches.map((item,i)=>{
+     const title=(item.el.querySelector('h1,h2,h3,h4,strong,b,.title,.name')||item.el).innerText||item.text;
+     const clean=title.replace(/\s+/g,' ').trim();
+     const snippet=item.text.length>230?item.text.slice(0,230)+'…':item.text;
+     return '<button type="button" class="sws-result" data-sws-index="'+i+'"><strong>'+esc(clean.slice(0,100))+'</strong><span>'+esc(snippet)+'</span></button>';
+   }).join('');
+ }
+ input.addEventListener('input',render);
+ reset.addEventListener('click',()=>{input.value='';render();input.focus();});
+ results.addEventListener('click',event=>{
+   const button=event.target.closest('[data-sws-index]');
+   if(!button)return;
+   const item=matches[Number(button.dataset.swsIndex)];
+   if(!item)return;
+   item.el.scrollIntoView({behavior:'smooth',block:'center'});
+   const old=item.el.style.outline;
+   item.el.style.outline='3px solid #65c9f1';
+   item.el.style.outlineOffset='4px';
+   setTimeout(()=>{item.el.style.outline=old;item.el.style.outlineOffset='';},1600);
+ });
+})();
+</script></body></html>
