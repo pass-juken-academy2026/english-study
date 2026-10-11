@@ -5254,7 +5254,17 @@ const EXTRA_WORDS = [
 ["鯨: 捕鯨に従事する 〔話〕 非常に大きい[すごい]もの","whale",58],
 ["(陪審員の)『評決』","verdict",58],
 ["『腰』,腰部","waist",58],
-["運動,練習,トレーニング","workout",58]
+["運動,練習,トレーニング","workout",58],
+["(人間・動物の)『肉』","flesh",50],
+["(自動車の)『車庫』","garage",50],
+["(劇の一部門としての)『喜劇』","comedy",50],
+["(穀類の)『粒』","grain",50],
+["意識,知覚","consciousness",50],
+["『倫理学』","ethics",50],
+["女優","actress",50],
+["酸性の","acid",50],
+["(努力・計画などの)失敗,ざ折,落胆,失意","frustration",50],
+["(…についての)『講演』,講話","discourse",50]
 ];
 const EXTRA_IDIOMS = [
 ["起きる","get up",42],["寝る","go to bed",42],["探す","look for",42],["世話をする","take care of",45],["到着する","arrive at",45],["参加する","take part in",45],["〜を楽しみに待つ","look forward to",50],["〜が得意だ","be good at",45],["〜に興味がある","be interested in",45],["〜を恐れる","be afraid of",45],
@@ -5281,8 +5291,32 @@ const EXTRA_IDIOMS = [
 ["〜をうまくやり遂げる","manage to do",55],["〜することを申し出る","offer to do",55],["〜することを拒む","refuse to do",55],["〜することをためらう","hesitate to do",65],["〜することを決意する","make up one's mind to do",65],["〜することをやめる","give up doing",55],["〜することを続ける","keep doing",48],["〜することを避ける","avoid doing",50],["〜することを延期する","put off doing",55],["〜することを楽しみにする","look forward to doing",60]
 ];
 const wordOptions = EXTRA_WORDS.map(x=>x[1]);
-EXTRA_WORDS.forEach((x,i)=>{ if(!vocab.some(q=>q.en===x[1] && (q.kind||"word")==="word")){ const ds=wordOptions.filter(w=>w!==x[1]).slice((i*3)%Math.max(1,wordOptions.length-3),(i*3)%Math.max(1,wordOptions.length-3)+3); vocab.push({id:"xw"+String(i+1).padStart(3,"0"),kind:"word",jp:x[0],en:x[1],level:x[2],distractors:ds.length===3?ds:["make","take","give"]});}});
-EXTRA_IDIOMS.forEach((x,i)=>{ if(!vocab.some(q=>q.en===x[1] && (q.kind||"word")==="idiom")){ const ds=EXTRA_IDIOMS.filter(y=>y[1]!==x[1]).slice((i*3)%Math.max(1,EXTRA_IDIOMS.length-3),(i*3)%Math.max(1,EXTRA_IDIOMS.length-3)+3).map(y=>y[1]); vocab.push({id:"xi"+String(i+1).padStart(3,"0"),kind:"idiom",jp:x[0],en:x[1],level:x[2],distractors:ds.length===3?ds:["at first","in fact","at last"]});}});
+const idiomOptions = EXTRA_IDIOMS.map(x=>x[1]);
+function chooseDistractors(pool,index,answer,fallback){
+ const out=[],key=String(answer).toLowerCase();
+ if(!pool.length)return fallback;
+ const base=(index*3)%pool.length;
+ for(let step=1;out.length<3&&step<=pool.length;step++){
+  const candidate=pool[(base+step)%pool.length],normalized=String(candidate).toLowerCase();
+  if(normalized===key||out.some(x=>String(x).toLowerCase()===normalized))continue;
+  out.push(candidate);
+ }
+ return out.length===3?out:fallback;
+}
+const knownWords=new Set(vocab.filter(q=>(q.kind||"word")==="word").map(q=>String(q.en).toLowerCase()));
+EXTRA_WORDS.forEach((x,i)=>{
+ const key=String(x[1]).toLowerCase();
+ if(knownWords.has(key))return;
+ vocab.push({id:"xw"+String(i+1).padStart(3,"0"),kind:"word",jp:x[0],en:x[1],level:x[2],distractors:chooseDistractors(wordOptions,i,x[1],["make","take","give"])});
+ knownWords.add(key);
+});
+const knownIdioms=new Set(vocab.filter(q=>(q.kind||"word")==="idiom").map(q=>String(q.en).toLowerCase()));
+EXTRA_IDIOMS.forEach((x,i)=>{
+ const key=String(x[1]).toLowerCase();
+ if(knownIdioms.has(key))return;
+ vocab.push({id:"xi"+String(i+1).padStart(3,"0"),kind:"idiom",jp:x[0],en:x[1],level:x[2],distractors:chooseDistractors(idiomOptions,i,x[1],["at first","in fact","at last"])});
+ knownIdioms.add(key);
+});
 /* Create a broad grammar bank from reusable, checked structures. */
 const grammarPatterns=[
 {topic:0,level:45,q:"{s} usually ___ {v} on weekdays.",opts:["{a}","{b}","{c}","{d}"],ans:"{a}",exp:"usually は習慣を表すため、現在形を使う。"},
