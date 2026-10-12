@@ -79,3 +79,79 @@ jobs:
               sys.exit(1)
           print(f'Checked {len(required)} Stage 2 English coverage markers')
           PY
+      - name: Validate Stage 2 English coverage and answer data
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re, sys
+          page = Path('index.html').read_text(encoding='utf-8')
+          required_functions = [
+              'updateExamBands', 'updateVocabBands', 'difficultyScore',
+              'englishLabStructure', 'englishLabErrorQuestion', 'englishLabVocab',
+              'englishLabReading', 'englishLabListeningNew', 'englishLabSpeak',
+              'englishLabSaveError', 'englishLabAdaptiveSummary',
+              'englishLabRecommendPractice', 'englishLabRubricScore',
+              'englishLabWritingCheck'
+          ]
+          required_markers = [
+              '志望校・目標レベル', 'ENGLISH_LAB_STRUCTURES',
+              'ENGLISH_LAB_ERRORS', 'ENGLISH_LAB_FAMILIES',
+              'ENGLISH_LAB_READINGS', 'ENGLISH_LAB_LISTENING',
+              'ENGLISH_LAB_RUBRIC', 'englishLabErrors',
+              '保存できませんでした', '10点', '改善点'
+          ]
+          missing = [x for x in required_functions if 'function ' + x + '(' not in page]
+          missing += [x for x in required_markers if x not in page]
+          if missing:
+              print('Missing Stage 2 English coverage: ' + ', '.join(missing))
+              sys.exit(1)
+          errors = []
+          error_start = page.find('const ENGLISH_LAB_ERRORS=[')
+          error_end = page.find('];', error_start)
+          error_src = page[error_start:error_end] if error_start >= 0 and error_end > error_start else ''
+          error_re = re.compile(r'\{q:"([^"]*)",opts:\[([^\]]*)\],a:(\d+),ex:"([^"]*)"\}')
+          error_items = error_re.findall(error_src)
+          for n, (_, raw_opts, raw_answer, explanation) in enumerate(error_items, 1):
+              opts = re.findall(r'"([^"]*)"', raw_opts)
+              if len(opts) < 2 or int(raw_answer) >= len(opts) or len(explanation) < 10:
+                  errors.append(f'grammar error item {n}: choices={len(opts)}, answer={raw_answer}')
+          reading_start = page.find('const ENGLISH_LAB_READINGS = [')
+          reading_end = page.find('const ENGLISH_LAB_LISTENING = [', reading_start)
+          reading_src = page[reading_start:reading_end] if reading_start >= 0 and reading_end > reading_start else ''
+          reading_re = re.compile(r'\{q:"([^"]*)",opts:\[([^\]]*)\],a:(\d+),why:"([^"]*)"\}')
+          reading_items = reading_re.findall(reading_src)
+          for n, (_, raw_opts, raw_answer, why) in enumerate(reading_items, 1):
+              opts = re.findall(r'"([^"]*)"', raw_opts)
+              if len(opts) < 2 or int(raw_answer) >= len(opts) or len(why) < 8:
+                  errors.append(f'reading item {n}: choices={len(opts)}, answer={raw_answer}')
+          structure_start = page.find('const ENGLISH_LAB_STRUCTURES=[')
+          structure_end = page.find('];', structure_start)
+          structure_src = page[structure_start:structure_end] if structure_start >= 0 and structure_end > structure_start else ''
+          structures = re.findall(r'\{sentence:"([^"]*)",s:"([^"]*)",v:"([^"]*)",o:"([^"]*)",c:"([^"]*)",type:"([^"]*)",translation:"([^"]*)",why:"([^"]*)"\}', structure_src)
+          listening_start = page.find('const ENGLISH_LAB_LISTENING = [')
+          listening_end = page.find('];\nlet englishLabReadingIndex', listening_start)
+          listening_src = page[listening_start:listening_end] if listening_start >= 0 and listening_end > listening_start else ''
+          listening_count = len(re.findall(r'en:"[^"]+",jp:"[^"]+",keys:\[', listening_src))
+          rubric_start = page.find('const ENGLISH_LAB_RUBRIC=[')
+          rubric_end = page.find('];', rubric_start)
+          rubric_src = page[rubric_start:rubric_end] if rubric_start >= 0 and rubric_end > rubric_start else ''
+          rubric_count = len(re.findall(r'\{key:"[^"]+",title:"[^"]+",desc:"[^"]+"\}', rubric_src))
+          if len(error_items) < 5:
+              errors.append(f'grammar error bank too small or not found: {len(error_items)}')
+          if len(reading_items) < 6:
+              errors.append(f'reading questions too small or not found: {len(reading_items)}')
+          if len(structures) < 6:
+              errors.append(f'SVOC structures too small or not found: {len(structures)}')
+          if listening_count < 6:
+              errors.append(f'listening prompts too small or not found: {listening_count}')
+          if rubric_count != 5:
+              errors.append(f'writing rubric should have 5 criteria, found {rubric_count}')
+          if not re.search(r'Array\.isArray\(rows\)', page):
+              errors.append('saved mistake records are not guarded against malformed storage')
+          if errors:
+              print('Invalid Stage 2 English data:')
+              print('\n'.join(errors))
+              sys.exit(1)
+          print(f'Stage 2 English coverage OK; grammar-error items: {len(error_items)}; reading questions: {len(reading_items)}; structures: {len(structures)}; listening prompts: {listening_count}; writing criteria: {rubric_count}')
+          PY
