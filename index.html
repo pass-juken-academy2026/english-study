@@ -43,7 +43,7 @@ button{min-height:42px}
 <header><div><h1>
         <span class="line">英語受験対策</span>
       </h1><p>単語・文法・短文・長文・英作文・模擬テスト</p><section class="panel" style="margin-top:14px;text-align:left"><label for="englishKnowledgeSearch"><strong>英単語・文法・関連語を検索</strong></label><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:8px"><input id="englishKnowledgeSearch" type="search" placeholder="例：環境、environment、現在完了" style="flex:1;min-width:0"><button type="button" id="englishKnowledgeSearchButton">検索</button></div><div id="englishKnowledgeSearchResults" aria-live="polite"></div></section></div></header>
-<main>
+<main><section data-shared-study-tools="true" aria-label="全教科共通ツール" style="margin:16px auto;padding:14px 16px;max-width:1050px;border:1px solid #47718f;border-radius:14px;background:#10233d;color:#edf5ff;font:15px/1.6 system-ui,sans-serif"><strong style="display:block;margin-bottom:4px;color:#7bdcff">全教科共通ツール</strong><span style="display:block;margin-bottom:10px">学習計画・復習・弱点分析・間違いノート・学習履歴・模試タイマー・3段階解説を共通画面で管理。</span><a href="https://pass-juken-academy2026.github.io/learning-portal/shared-study-tools.html" style="display:inline-block;padding:8px 12px;border:1px solid #7bdcff;border-radius:9px;color:#7bdcff;text-decoration:none;font-weight:700">共通学習ツールを開く →</a></section>
 <section id="home"><div class="head" style="margin-bottom:15px"><div><h2>学習メニュー</h2><span class="muted">履歴と苦手分野はこのブラウザに保存されます。</span></div><div class="panel">解答済み <b id="solvedCount">0</b>問　/　文法正答率 <b id="grammarRate">—</b></div></div>
 <div class="grid">
 <div class="card"><span class="tag">単語・熟語を大量収録</span><h3>① 英単語</h3><p>日本語→英語 / 英語→日本語。4択・入力式を選択。</p><button onclick="setup('vocab')">始める</button></div>
