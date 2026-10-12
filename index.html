@@ -7058,13 +7058,8 @@ for(let i=0;i<200;i++){
  const level=grade==="highschool"?45+(i%3)*5:grade==="university"?60+(i%4)*5:grade==="eiken2"?65:75;
  writing.push({id:"wx"+String(i+1).padStart(3,"0"),level:level,prompt:frame.replace("{topic}",topic),words:grade==="highschool"?35:grade==="eiken2"?80:grade==="eikenPre1"?120:90});
 }
-/* Expand both mock-test tracks to at least 200 unique items each. */
-const mockTemplates=grammar.slice();
-for(let i=0;i<400;i++){
- const base=mockTemplates[i%mockTemplates.length];
- const examType=i%2===0?"saitama":"common";
- mock.push({id:"mx"+String(i+1).padStart(3,"0"),examType:examType,level:base.level,question:base.question,options:base.options.slice(),answer:base.answer,explain:base.explain});
-}
+/* 模擬テストには、各形式用に内容を確認した問題だけを登録する。
+   文法問題の単純コピーで問題数だけを増やさない。 */
 
 
 function lookupHome(){hide();$("lookup").classList.remove("hidden");$("lookupQuery").value="";$("lookupDirection").value="en-ja";$("lookupKind").value="both";doLookup();$("lookupQuery").focus()}
