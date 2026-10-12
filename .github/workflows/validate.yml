@@ -95,7 +95,8 @@ jobs:
               'englishLabWritingCheck'
           ]
           required_markers = [
-              '偏差値帯を選び', 'ENGLISH_LAB_STRUCTURES',
+              '偏差値帯を選び',
+              '類義語・近い表現', 'ENGLISH_LAB_STRUCTURES',
               'ENGLISH_LAB_ERRORS', 'ENGLISH_LAB_FAMILIES',
               'ENGLISH_LAB_READINGS', 'ENGLISH_LAB_LISTENING',
               'ENGLISH_LAB_RUBRIC', 'englishLabErrors',
@@ -137,6 +138,8 @@ jobs:
           rubric_end = page.find('];', rubric_start)
           rubric_src = page[rubric_start:rubric_end] if rubric_start >= 0 and rubric_end > rubric_start else ''
           rubric_count = len(re.findall(r'\{key:"[^"]+",title:"[^"]+",desc:"[^"]+"\}', rubric_src))
+          if page.count('synonyms:"') < 6:
+              errors.append(f'vocabulary synonym groups should be 6, found {page.count("synonyms:\\\"")} ')
           if len(error_items) < 5:
               errors.append(f'grammar error bank too small or not found: {len(error_items)}')
           if len(reading_items) < 6:
