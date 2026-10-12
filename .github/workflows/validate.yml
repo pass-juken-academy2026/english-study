@@ -51,3 +51,29 @@ jobs:
               print(f'Checked {f}: {len(a.scripts)} inline script(s), {len(a.ids)} IDs')
           if failed: sys.exit(1)
           PY
+
+      - name: Check Stage 2 English feature coverage
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import sys
+          page = Path('index.html').read_text(encoding='utf-8')
+          required = [
+              'ENGLISH_LAB_FAMILIES', 'englishLabVocab',
+              'ENGLISH_LAB_ERRORS', 'englishLabErrorQuestion',
+              'ENGLISH_LAB_STRUCTURES', 'englishLabStructure',
+              'ENGLISH_LAB_READINGS', 'englishLabReading',
+              'ENGLISH_LAB_LISTENING', 'englishLabSpeak',
+              'englishLabWritingCheck', '採点基準5項目',
+              'id="el-reading-level"', 'englishLabReadingNext',
+              'id="el-listening-start-word"', 'words.slice(start-1).join(" ")',
+              'englishLabRecommendPractice', 'englishLabSavedErrors',
+          ]
+          missing = [item for item in required if item not in page]
+          if missing:
+              print('Missing Stage 2 English coverage:')
+              print('\n'.join(missing))
+              sys.exit(1)
+          print(f'Checked {len(required)} Stage 2 English coverage markers')
+          PY
