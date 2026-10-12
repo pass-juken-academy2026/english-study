@@ -68,6 +68,8 @@ jobs:
               'englishLabWritingCheck', '採点基準5項目',
               'id="el-reading-level"', 'englishLabReadingNext',
               'id="el-listening-start-word"', 'words.slice(start-1).join(" ")',
+              'englishLabReadingIndex=[0,0,0]',
+              'englishLabReadingIndex[level]=(englishLabReadingIndex[level]+1)%pool.length',
               'englishLabRecommendPractice', 'englishLabSavedErrors',
           ]
           missing = [item for item in required if item not in page]
