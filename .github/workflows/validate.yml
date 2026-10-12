@@ -95,7 +95,7 @@ jobs:
               'englishLabWritingCheck'
           ]
           required_markers = [
-              '志望校・目標レベル', 'ENGLISH_LAB_STRUCTURES',
+              '偏差値帯を選び', 'ENGLISH_LAB_STRUCTURES',
               'ENGLISH_LAB_ERRORS', 'ENGLISH_LAB_FAMILIES',
               'ENGLISH_LAB_READINGS', 'ENGLISH_LAB_LISTENING',
               'ENGLISH_LAB_RUBRIC', 'englishLabErrors',
