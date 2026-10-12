@@ -51,7 +51,7 @@ button{min-height:42px}
 <div class="card"><span class="tag">200題以上</span><h3>③ 短文問題</h3><p>日本語を英語に訳す練習。苦手文法に関連する問題を優先します。</p><button onclick="setup('short')">始める</button></div>
 <div class="card"><span class="tag">200題以上</span><h3>④ 長文読解</h3><p>偏差値帯を選び、未読の長文に挑戦。</p><button onclick="setup('reading')">始める</button></div>
 <div class="card"><span class="tag">200題以上</span><h3>⑤ ライティング</h3><p>お題に英語で答え、語数や構成を簡易チェック。</p><button onclick="setup('writing')">始める</button></div>
-<div class="card"><span class="tag">200題以上</span><h3>⑥ 模擬テスト</h3><p>最初に「埼玉県の高校入試」か「大学受験用の共通テスト」を選んで挑戦。</p><button onclick="setup('mock')">始める</button></div>
+<div class="card"><span class="tag">入試形式別・30題</span><h3>⑥ 模擬テスト</h3><p>最初に「埼玉県の高校入試」か「大学受験用の共通テスト」を選んで挑戦。</p><button onclick="setup('mock')">始める</button></div>
 <div class="card"><span class="tag">文法を基礎から解説</span><h3>⑦ 文法の授業</h3><p>英文の仕組みを、例文とポイントで一つずつ理解。暗記だけでなく「なぜその形か」を学びます。</p><button onclick="setup('guide')">学習する</button></div>
 <div class="card"><span class="tag">単語・熟語を検索</span><h3>⑧ 単語・熟語検索帳</h3><p>英語→日本語、日本語→英語で検索。日本語からは複数の英訳候補を表示します。</p><button onclick="lookupHome()">検索帳を開く</button></div><div class="card"><span class="tag">第2段階・新機能</span><h3>⑨ 英文構造・ミス分析ラボ</h3><p>英文のS/V/O/Cを見抜く練習、文法ミスの原因分析、英作文チェックをまとめて練習。</p><button onclick="openEnglishLab()">始める</button></div></div><div class="panel" style="margin-top:14px"><div class="head"><h3>学習履歴</h3><button class="secondary" onclick="historyPage()">履歴・苦手分野を見る</button></div><p class="muted">解いた問題はID単位で保存し、再出題しません。未出題問題が足りない場合は、ある分だけ出題します。</p><details><summary>保存について</summary><p class="muted">同じ端末・ブラウザでページを閉じても履歴を保持します。サイトデータ削除や別端末への同期には対応していません。</p><button class="danger" onclick="resetData()">履歴をすべて削除</button></details></div>
 </section>
@@ -555,7 +555,17 @@ const mock=[
 ,{id:"m17",examType:"common",level:65,question:"The new policy is expected ___ the number of plastic bags used.",options:["reduce","reducing","to reduce","reduced"],answer:"to reduce",explain:"be expected to do の形。"}
 ,{id:"m18",examType:"common",level:70,question:"Not only ___ the deadline, but she also improved the final report.",options:["she met","did she meet","she did met","met she"],answer:"did she meet",explain:"Not only が文頭に来ると主節は倒置する。"}
 ,{id:"m19",examType:"common",level:65,question:"The results were different from ___ we had expected.",options:["that","what","which one","who"],answer:"what",explain:"what は節の中で目的語になる。"}
-,{id:"m20",examType:"common",level:70,question:"Had I known about the traffic, I ___ an earlier train.",options:["take","will take","would have taken","had taken"],answer:"would have taken",explain:"Had I known は If I had known の倒置形。"}
+,{id:"m20",examType:"common",level:70,question:"Had I known about the traffic, I ___ an earlier train.",options:["take","will take","would have taken","had taken"],answer:"would have taken",explain:"Had I known は If I had known の倒置形。"},
+{id:"m21",examType:"saitama",level:50,question:"This is the first time I ___ this kind of food.",options:["try","tried","have tried","am trying"],answer:"have tried",explain:"This is the first time ... では、経験を表す現在完了形がよく使われます。"},
+{id:"m22",examType:"saitama",level:55,question:"The movie was ___ interesting that I watched it twice.",options:["so","such","too","enough"],answer:"so",explain:"so + 形容詞 + that ... で「とても〜なので…」。"},
+{id:"m23",examType:"saitama",level:55,question:"My teacher asked me ___ I had finished the assignment.",options:["that","whether","what","which"],answer:"whether",explain:"「終えたかどうか」を表す間接疑問では whether / if を使えます。"},
+{id:"m24",examType:"saitama",level:60,question:"The park ___ we played soccer is near the station.",options:["where","which","whose","what"],answer:"where",explain:"場所を表す先行詞 park を受け、関係副詞 where が使えます。"},
+{id:"m25",examType:"saitama",level:60,question:"You had better ___ your umbrella; it may rain later.",options:["take","to take","taking","took"],answer:"take",explain:"had better の後ろは動詞の原形です。"},
+{id:"m26",examType:"common",level:65,question:"The report, ___ was published yesterday, presents the results of the study.",options:["who","where","which","what"],answer:"which",explain:"先行詞 report は物なので、非制限用法の関係代名詞 which を使います。"},
+{id:"m27",examType:"common",level:65,question:"Neither the students nor their teacher ___ aware of the schedule change.",options:["were","are","was","have been"],answer:"was",explain:"neither A nor B では一般に動詞は近い主語に一致します。teacher は単数なので was。"},
+{id:"m28",examType:"common",level:65,question:"The company decided to postpone the launch ___ the safety tests were incomplete.",options:["because","despite","unless","whereas"],answer:"because",explain:"後ろに主語＋動詞の節が続き、理由を表す because が適切です。"},
+{id:"m29",examType:"common",level:70,question:"Only after the meeting ___ the reason for the delay.",options:["we understood","did we understand","we did understood","understood we"],answer:"did we understand",explain:"Only after ... が文頭に来ると、主節で助動詞を用いた倒置が起こります。"},
+{id:"m30",examType:"common",level:70,question:"The data suggest that the new method is effective, ___ further research is still needed.",options:["so","although","unless","because of"],answer:"although",explain:"前半と後半は対比なので、譲歩を表す although が適切です。"}
 
 ];
 
