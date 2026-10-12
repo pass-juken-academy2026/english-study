@@ -47,9 +47,9 @@ button{min-height:42px}
 <section id="home"><div class="head" style="margin-bottom:15px"><div><h2>学習メニュー</h2><span class="muted">履歴と苦手分野はこのブラウザに保存されます。</span></div><div class="panel">解答済み <b id="solvedCount">0</b>問　/　文法正答率 <b id="grammarRate">—</b></div></div>
 <div class="grid">
 <div class="card"><span class="tag">単語・熟語を大量収録</span><h3>① 英単語</h3><p>日本語→英語 / 英語→日本語。4択・入力式を選択。</p><button onclick="setup('vocab')">始める</button></div>
-<div class="card"><span class="tag">200題以上</span><h3>② 文法</h3><p>分野を選択。終了後に苦手分野を分析し、苦手分野だけ続けられます。</p><button onclick="setup('grammar')">始める</button></div>
-<div class="card"><span class="tag">200題以上</span><h3>③ 短文問題</h3><p>日本語を英語に訳す練習。苦手文法に関連する問題を優先します。</p><button onclick="setup('short')">始める</button></div>
-<div class="card"><span class="tag">200題以上</span><h3>④ 長文読解</h3><p>偏差値帯を選び、未読の長文に挑戦。</p><button onclick="setup('reading')">始める</button></div>
+<div class="card"><span class="tag">約80題</span><h3>② 文法</h3><p>分野を選択。終了後に苦手分野を分析し、苦手分野だけ続けられます。</p><button onclick="setup('grammar')">始める</button></div>
+<div class="card"><span class="tag">30題</span><h3>③ 短文問題</h3><p>日本語を英語に訳す練習。苦手文法に関連する問題を優先します。</p><button onclick="setup('short')">始める</button></div>
+<div class="card"><span class="tag">8題</span><h3>④ 長文読解</h3><p>偏差値帯を選び、未読の長文に挑戦。</p><button onclick="setup('reading')">始める</button></div>
 <div class="card"><span class="tag">200題以上</span><h3>⑤ ライティング</h3><p>お題に英語で答え、語数や構成を簡易チェック。</p><button onclick="setup('writing')">始める</button></div>
 <div class="card"><span class="tag">入試形式別・30題</span><h3>⑥ 模擬テスト</h3><p>最初に「埼玉県の高校入試」か「大学受験用の共通テスト」を選んで挑戦。</p><button onclick="setup('mock')">始める</button></div>
 <div class="card"><span class="tag">文法を基礎から解説</span><h3>⑦ 文法の授業</h3><p>英文の仕組みを、例文とポイントで一つずつ理解。暗記だけでなく「なぜその形か」を学びます。</p><button onclick="setup('guide')">学習する</button></div>
@@ -6960,7 +6960,7 @@ const grammarPatterns=[
 const grammarFill=[
 ["My sister","walks","every day","walk","walked","is walking"],["The students","study","after school","studies","studied","are study"],["Our teacher","explains","the rule clearly","explain","explaining","explained"],["The train","leaves","at eight","leave","leaving","left"],["This machine","works","well","work","worked","working"],["The museum","opens","at ten","open","opened","opening"],["His parents","live","near the station","lives","living","lived"],["The river","flows","through the town","flow","flowing","flowed"],["My friends","enjoy","playing tennis","enjoys","enjoyed","enjoying"],["The shop","sells","fresh bread","sell","selling","sold"]
 ];
-for(let i=0;i<220;i++){
+for(let i=0;i<grammarPatterns.length;i++){
  const p=grammarPatterns[i%grammarPatterns.length], f=grammarFill[Math.floor(i/grammarPatterns.length)%grammarFill.length];
  let q=p.q.replace("{s}",f[0]).replace("{v}",f[2]).replace("___", "___");
  let opts=p.opts.map(x=>x.replace("{a}",f[1]).replace("{b}",f[3]).replace("{c}",f[4]).replace("{d}",f[5]));
@@ -7002,7 +7002,7 @@ const shortValues=[
 {time:"7時20分",place:"the stadium",activity:"a match",past:"watched a match",thing:"plan",verb:"make a plan"},
 {time:"8時40分",place:"the post office",activity:"a letter",past:"sent a letter",thing:"gift",verb:"choose a gift"}
 ];
-for(let i=0;i<200;i++){
+for(let i=0;i<0;i++){
  const t=shortTemplates[i%shortTemplates.length],v=shortValues[Math.floor(i/shortTemplates.length)%shortValues.length];
  let jp=t[0],en=t[1];
  Object.keys(v).forEach(k=>{jp=jp.replaceAll("{"+k+"}",v[k]);en=en.replaceAll("{"+k+"}",v[k]);});
@@ -7030,7 +7030,7 @@ const readingQs=[
 {q:"Which statement is supported by the passage?",opts:["The activity involved repeated effort.","The main task was completed in one minute.","No one learned anything from the activity.","The group refused to change its plan."],ans:0,ex:"本文は活動を通じた工夫や継続を説明している。"},
 {q:"What is the best lesson from the passage?",opts:["Careful effort can lead to improvement.","Plans should never be changed.","Questions always slow down learning.","Teamwork is never useful."],ans:0,ex:"本文は工夫や継続がよい結果につながることを示す。"}
 ];
-for(let i=0;i<40;i++){
+for(let i=0;i<0;i++){
  const sc=readingScenes[i%readingScenes.length], name=i<10?sc[0]:sc[0]+[""," K."," M."," S."][Math.floor(i/10)%4];
  const subject=sc[1]+" involving "+sc[2], action=sc[3], result=sc[4];
  const passage=name+" took part in a "+sc[1]+". The main task involved "+sc[2]+". At first, the group faced a few difficulties, so "+name+" decided to "+action+". The members shared ideas and checked their progress regularly. After some time, they noticed that their work was improving. "+result+" The experience taught them to pay attention to small steps rather than expect instant success.";
