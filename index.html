@@ -6958,7 +6958,7 @@ const grammarPatterns=[
 {topic:18,level:75,q:"Rarely ___ such a convincing argument.",opts:["have I heard","I have heard","I heard have","heard I have"],ans:"have I heard",exp:"否定的な副詞が文頭に来ると倒置する。"}
 ];
 const grammarFill=[
-["My sister","walks","every day","walk","walked","is walking"],["The students","study","after school","studies","studied","are study"],["Our teacher","explains","the rule clearly","explain","explaining","explained"],["The train","leaves","at eight","leave","leaving","left"],["This machine","works","well","work","worked","working"],["The museum","opens","at ten","open","opened","opening"],["His parents","live","near the station","lives","living","lived"],["The river","flows","through the town","flow","flowing","flowed"],["My friends","enjoy","playing tennis","enjoys","enjoyed","enjoying"],["The shop","sells","fresh bread","sell","selling","sold"]
+["My sister","walks","to school","walk","walked","is walking"],["The students","study","after school","studies","studied","are study"],["Our teacher","explains","the rule clearly","explain","explaining","explained"],["The train","leaves","at eight","leave","leaving","left"],["This machine","works","well","work","worked","working"],["The museum","opens","at ten","open","opened","opening"],["His parents","live","near the station","lives","living","lived"],["The river","flows","through the town","flow","flowing","flowed"],["My friends","enjoy","playing tennis","enjoys","enjoyed","enjoying"],["The shop","sells","fresh bread","sell","selling","sold"]
 ];
 for(let i=0;i<grammarPatterns.length;i++){
  const p=grammarPatterns[i%grammarPatterns.length], f=grammarFill[Math.floor(i/grammarPatterns.length)%grammarFill.length];
@@ -7056,7 +7056,11 @@ for(let i=0;i<200;i++){
  const topic=writingTopics[i%writingTopics.length], frame=writingFrames[Math.floor(i/writingTopics.length)%writingFrames.length];
  const grade=i%4===0?"highschool":i%4===1?"university":i%4===2?"eiken2":"eikenPre1";
  const level=grade==="highschool"?45+(i%3)*5:grade==="university"?60+(i%4)*5:grade==="eiken2"?65:75;
- writing.push({id:"wx"+String(i+1).padStart(3,"0"),level:level,prompt:frame.replace("{topic}",topic),words:grade==="highschool"?35:grade==="eiken2"?80:grade==="eikenPre1"?120:90});
+ const prompt=frame.replace("{topic}",topic);
+ const item={id:"wx"+String(i+1).padStart(3,"0"),level:level,prompt:prompt,words:grade==="highschool"?35:grade==="eiken2"?80:grade==="eikenPre1"?120:90};
+ if(grade==="highschool") writingHighschool.push(item);
+ else if(grade==="university") writingUniversity.push(item);
+ else eikenWriting.push({...item,grade:grade==="eiken2"?"2":"pre1"});
 }
 /* 模擬テストには、各形式用に内容を確認した問題だけを登録する。
    文法問題の単純コピーで問題数だけを増やさない。 */
