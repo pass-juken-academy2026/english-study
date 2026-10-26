@@ -7013,12 +7013,14 @@ function chooseDistractors(pool,index,answer,fallback){
 }
 const knownEnglish=new Set(vocab.map(q=>String(q.en).toLowerCase()));
 EXTRA_WORDS.forEach((x,i)=>{
+ if(!Array.isArray(x)||x.length<3)return;
  const key=String(x[1]).toLowerCase();
  if(knownEnglish.has(key))return;
  vocab.push({id:"xw"+String(i+1).padStart(3,"0"),kind:"word",jp:x[0],en:x[1],level:x[2],distractors:chooseDistractors(wordOptions,i,x[1],["make","take","give"])});
  knownEnglish.add(key);
 });
 EXTRA_IDIOMS.forEach((x,i)=>{
+ if(!Array.isArray(x)||x.length<3)return;
  const key=String(x[1]).toLowerCase();
  if(knownEnglish.has(key))return;
  vocab.push({id:"xi"+String(i+1).padStart(3,"0"),kind:"idiom",jp:x[0],en:x[1],level:x[2],distractors:chooseDistractors(idiomOptions,i,x[1],["at first","in fact","at last"])});
