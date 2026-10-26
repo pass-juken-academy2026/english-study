@@ -117,7 +117,8 @@ function cleanText(v) { return String(v || '').replace(/\s+/g, ' ').trim(); }
         await page.waitForTimeout(200);
         const count = await page.locator('button:visible:not([disabled])').count();
         for (let i = 0; i < count; i++) {
-          await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 20000 });
+          await page.evaluate(() => { try { localStorage.clear(); sessionStorage.clear(); } catch {} });
+          await page.reload({ waitUntil: 'domcontentloaded', timeout: 20000 });
           await page.waitForTimeout(100);
           const buttons = page.locator('button:visible:not([disabled])');
           if (i >= await buttons.count()) continue;
