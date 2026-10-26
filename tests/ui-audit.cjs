@@ -96,7 +96,7 @@ function cleanText(v) { return String(v || '').replace(/\s+/g, ' ').trim(); }
               || (el.getAttribute('title') || '').trim()
               || (el.labels && Array.from(el.labels).some(l => l.innerText.trim()))
               || (id && document.querySelector('label[for="' + CSS.escape(id) + '"]'))
-              || (el.innerText || el.value || el.getAttribute('placeholder') || '').trim();
+              || (el.innerText || el.textContent || el.value || el.getAttribute('placeholder') || '').trim();
             return !hasLabel;
           }).map(el => el.tagName.toLowerCase() + (el.id ? '#' + el.id : '')));
           if (unlabeled.length) reviewFlags.push(rel + ' [' + viewport.name + '] controls without accessible labels: ' + unlabeled.join(', '));
@@ -142,7 +142,7 @@ function cleanText(v) { return String(v || '').replace(/\s+/g, ' ').trim(); }
             active: document.activeElement?.id || document.activeElement?.tagName || '',
           }));
           if (before.url === after.url && before.html === after.html && before.active === after.active && !silentActionAllowed(label)) {
-            reviewFlags.push(rel + ': button "' + label + '" had no observable effect when clicked');
+            failures.push(rel + ': button "' + label + '" had no observable effect when clicked');
           }
           if (jsErrors.length) {
             failures.push(rel + ': JS error after button "' + label + '": ' + Array.from(new Set(jsErrors)).join('; '));
