@@ -112,6 +112,7 @@ function cleanText(v) { return String(v || '').replace(/\s+/g, ' ').trim(); }
       const jsErrors = [];
       page.on('pageerror', e => jsErrors.push(e.message));
       try {
+        await page.addInitScript(() => { try { localStorage.clear(); sessionStorage.clear(); } catch {} });
         await page.goto(route, { waitUntil: 'domcontentloaded', timeout: 20000 });
         await page.waitForTimeout(200);
         const count = await page.locator('button:visible:not([disabled])').count();
