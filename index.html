@@ -232,7 +232,7 @@ function options(arr){return `<div class="options">${arr.map(o=>`<label class="o
 function norm(s){return String(s).trim().toLowerCase().replace(/[.!?。、「」]/g,"").replace(/\s+/g," ")}
 function answer(){let q=qNow,raw="",correct=false,answer="",feedback="",topic=q.topic;
 if(mode==="vocab"){raw=cfg.vtype==="typed"?$("typed").value.trim():document.querySelector('input[name=ans]:checked')?.value||"";if(!raw){alert("答えを選ぶか入力してください");return}answer=q.liveAnswer;correct=norm(raw)===norm(answer);feedback=correct?"正解！":"正解："+answer}
-else if(["grammar","mock","reading"].includes(mode)){raw=document.querySelector('input[name=ans]:checked')?.value||"";if(!raw){alert("選択肢を選んでください");return}answer=q.answer;correct=raw===answer;feedback=(correct?"正解！":"正解："+answer)+(q.explain?"\\n"+q.explain:"")+(cfg.mockType==="common-listening"?"\\n読み上げスクリプト："+q.audioText:"")}
+else if(["grammar","mock","reading"].includes(mode)){raw=document.querySelector('input[name=ans]:checked')?.value||"";if(!raw){alert("選択肢を選んでください");return}answer=q.answer;correct=raw===answer;feedback=(correct?"正解！":"正解："+answer)+(q.explain?" "+q.explain:"")+(cfg.mockType==="common-listening"?" / 読み上げスクリプト："+q.audioText:"")}
 else if(mode==="short"){raw=$("typed").value.trim();if(!raw){alert("英文を入力してください");return}answer=q.answer;correct=norm(raw)===norm(answer);feedback=(correct?"入力は模範解答と一致しました。":"入力と模範解答を比べて確認しましょう。")+"\
 模範解答："+answer+"\
 ポイント："+(q.focus||"語順・文法")+"\
