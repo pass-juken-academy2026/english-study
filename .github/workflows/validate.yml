@@ -159,3 +159,5 @@ jobs:
               sys.exit(1)
           print(f'Stage 2 English coverage OK; grammar-error items: {len(error_items)}; reading questions: {len(reading_items)}; structures: {len(structures)}; listening prompts: {listening_count}; writing criteria: {rubric_count}')
           PY
+      - name: Check common-test reading and listening banks
+        run: node tests/common-test-audit.cjs
