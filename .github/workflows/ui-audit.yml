@@ -33,6 +33,8 @@ jobs:
           done
           cat /tmp/ui-audit-server.log
           exit 1
+      - name: Test English mock PDF exports and answer isolation
+        run: node tests/english-mock-pdf-export.test.cjs
       - name: Audit every HTML page, viewport, local resource and button
         run: node tests/ui-audit.cjs
       - name: Upload screenshots for diagnosis
