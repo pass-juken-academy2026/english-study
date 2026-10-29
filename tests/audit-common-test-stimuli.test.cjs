@@ -48,4 +48,4 @@ assert.equal(audit([missingDocuments]).passed, false, 'multi-document items need
 assert.equal(audit({ notQuestions: [] }).passed, false, 'unknown schema should fail closed');
 assert.equal(auditItem(null).errors.length > 0, true, 'null item should fail');
 
-console.log('PASS English Common Test stimulus audit regression tests (8 assertions)');
+console.log('PASS English Common Test stimulus audit regression tests (9 assertions)');
