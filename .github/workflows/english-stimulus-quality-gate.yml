@@ -14,5 +14,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: Audit live English Common Test passage lengths, tables, options, answers and explanations
+        run: node tests/english-common-stimulus-content.test.cjs
       - name: Run regression tests for the standalone quality checker
         run: node tests/audit-common-test-stimuli.test.cjs
