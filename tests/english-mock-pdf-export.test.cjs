@@ -33,6 +33,23 @@ const { chromium } = require('playwright');
     assert.match(combined, /Questions/);
     assert.match(combined, /Answers and explanations/);
     assert.match(combined, /Answer:/);
+
+    await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
+    const copy = async (label) => {
+      await page.getByRole('button', { name: label }).click();
+      await page.waitForFunction(() => (document.querySelector('#englishCopyStatus')?.textContent || '').includes('コピーしました'));
+      return page.evaluate(() => navigator.clipboard.readText());
+    };
+    const questionCopy = await copy('問題のみテキスト');
+    assert.match(questionCopy, /Questions/);
+    assert.doesNotMatch(questionCopy, /Answer:|Answers and explanations/);
+    const answerCopy = await copy('解答・解説テキスト');
+    assert.match(answerCopy, /Answer:/);
+    assert.match(answerCopy, /Explanation:/);
+    const combinedCopy = await copy('問題＋解答テキスト');
+    assert.match(combinedCopy, /Questions/);
+    assert.match(combinedCopy, /Answers and explanations/);
+    assert.match(combinedCopy, /Answer:/);
     console.log('PASS English mock PDF exports and answer isolation');
   } finally { await browser.close(); }
 })().catch(error => { console.error(error); process.exit(1); });
