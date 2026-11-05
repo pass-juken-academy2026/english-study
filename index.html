@@ -7334,4 +7334,16 @@ function englishLabRecommendPractice(){const rows=englishLabSavedErrors(),counts
 function englishLabWritingCheck(){const text=$("el-writing-answer").value.trim(),words=text.match(/[A-Za-z]+(?:[’'][A-Za-z]+)*/g)||[],sentences=text.split(/[.!?]+/).filter(x=>x.trim()).length,checked=["el-check-answer","el-check-reason","el-check-example","el-check-grammar","el-check-spelling"].filter(id=>$(id).checked).length;$("el-writing-count").textContent="語数："+words.length+"語 / 文数："+sentences+"文";const issues=[];if(!text)issues.push("英文を入力してください。");else{if(!/^[A-Z]/.test(text))issues.push("文頭を大文字で始めているか確認。");if(!/[.!?]$/.test(text))issues.push("文末のピリオド・疑問符を確認。");if(!/\b(I|we|they|he|she|it|students|people|schools)\b/i.test(text))issues.push("主語が明確か確認。");if(!/\b(am|is|are|was|were|do|does|did|have|has|had|can|will|should|must|like|likes|think|believe|want|wants|study|studies|read|reads)\b/i.test(text))issues.push("動詞が入っているか確認（単語一覧だけになっていないか）。");}const out=$("el-writing-result");out.innerHTML='<div class="feedback '+(text&&checked>=4&&!issues.length?"good":"bad")+'"><b>チェック項目 '+checked+'/5</b><p>語数：'+words.length+'語、文数：'+sentences+'文</p><p>'+esc(issues.length?issues.join(" "):"形式面の基本項目は確認できました。内容・文法の正確さ・自然さは自分でも見直してください。")+'</p><p>自己確認：'+(checked>=4?"多くの項目を確認済み":"未チェック項目も確認しよう")+'</p><small>※自動判定は目安です。正確な添削や意味の評価ではありません。</small></div>';}
 englishLabRubricInit();englishLabReading();englishLabListeningLoad();englishLabRenderErrors();
 $("el-writing-answer").addEventListener("input",()=>{const t=$("el-writing-answer").value,words=t.match(/[A-Za-z]+(?:[’'][A-Za-z]+)*/g)||[];$("el-writing-count").textContent="語数："+words.length+"語";});
-</script></body></html>
+</script><style id="readability-contrast-fix-20261105">
+.panel[style*="background:#f8faff"]{background:#f8faff!important;color:#182235!important}
+.panel[style*="background:#f8faff"] *{color:#182235!important}
+.panel[style*="background:#fff8e8"]{background:#fff8e8!important;color:#182235!important}
+.panel[style*="background:#fff8e8"] *{color:#182235!important}
+.note{background:#17324f!important;color:#edf5ff!important}
+.note *{color:#edf5ff!important}
+.feedback.good{background:#124b36!important;color:#e8f7ef!important}
+.feedback.good *{color:#e8f7ef!important}
+.feedback.bad{background:#64251f!important;color:#fff0ee!important}
+.feedback.bad *{color:#fff0ee!important}
+.muted,.foot,.card p{color:#c3d5e9!important}
+</style></body></html>
