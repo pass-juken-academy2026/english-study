@@ -81,7 +81,7 @@ const $=id=>document.getElementById(id),KEY="englishStudyLab_v1";
 const blank=()=>({solved:{},attempts:[],topicStats:{},weak:[],weakAreas:[]});
 let data;try{data=JSON.parse(localStorage.getItem(KEY))||blank()}catch(e){data=blank()}
 data.weak ||= [];data.weakAreas ||= [];data.topicStats ||= {};data.solved ||= {};data.attempts ||= [];
-function save(){localStorage.setItem(KEY,JSON.stringify(data));stats()}
+let storageWarningShown=false;function save(){try{localStorage.setItem(KEY,JSON.stringify(data))}catch(e){if(!storageWarningShown){storageWarningShown=true;alert("ブラウザの保存領域を利用できないため、学習記録を保存できません。ブラウザの設定や空き容量を確認してください。")}}stats()}
 function stats(){$("solvedCount").textContent=Object.keys(data.solved).length;let t=0,c=0;Object.values(data.topicStats).forEach(x=>{t+=x.total;c+=x.correct});$("grammarRate").textContent=t?Math.round(c/t*100)+"%":"—"}
 function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function hide(){["home","setup","quiz","results","history","englishLab"].forEach(x=>$(x).classList.add("hidden"))}function home(){if(commonExamTimer){clearInterval(commonExamTimer);commonExamTimer=null;}hide();$("home").classList.remove("hidden");stats()}
