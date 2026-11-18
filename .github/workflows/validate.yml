@@ -161,3 +161,5 @@ jobs:
           PY
       - name: Check common-test reading and listening banks
         run: node tests/common-test-audit.cjs
+      - name: Check English exam answer balance and no-repeat rotation
+        run: node tests/answer-balance-rotation.test.cjs
